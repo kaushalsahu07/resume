@@ -5,13 +5,36 @@ import type { Portfolio } from '../types/portfolio'
 import { getTemplateById } from '../components/templates'
 import { Sparkles, ArrowRight } from 'lucide-react'
 
-export default function PublicPortfolio() {
-  const { slug } = useParams()
+export function getSubdomainFromHostname(hostname = window.location.hostname): string | null {
+  const parts = hostname.split('.')
+  if (parts.length >= 2 && !hostname.match(/^\d+\.\d+\.\d+\.\d+$/)) {
+    const isLocalhost = hostname.includes('localhost')
+    if (isLocalhost && parts.length >= 2 && parts[0] !== 'localhost') {
+      return parts[0].toLowerCase()
+    }
+    if (!isLocalhost && parts.length >= 3) {
+      const sub = parts[0].toLowerCase()
+      if (!['www', 'app', 'api', 'admin', 'portfolio'].includes(sub)) {
+        return sub
+      }
+    }
+  }
+  return null
+}
+
+export default function PublicPortfolio({ subdomainSlug }: { subdomainSlug?: string }) {
+  const { slug: paramSlug } = useParams()
+  const slug = subdomainSlug || paramSlug || getSubdomainFromHostname()
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
   useEffect(() => {
+    if (!slug) {
+      setError(true)
+      setLoading(false)
+      return
+    }
     const fetchPortfolio = async () => {
       try {
         const data = await apiClient.request<Portfolio>(`/p/${slug}`)
@@ -59,7 +82,8 @@ export default function PublicPortfolio() {
     )
   }
 
-  const TemplateComponent = getTemplateById(portfolio.templateId)?.component
+  const activeTemplateId = portfolio.templateId || (portfolio as any).template_id || 'cosmic-violet'
+  const TemplateComponent = getTemplateById(activeTemplateId)?.component
 
   return (
     <div className="min-h-screen relative">

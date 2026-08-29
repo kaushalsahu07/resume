@@ -20,11 +20,23 @@ def get_user_supabase(authorization: str = Header(...)) -> Client:
 
 # ─── Portfolio CRUD ───────────────────────────────────────────────────────────
 
+def _format_portfolio(data: dict) -> dict:
+    if not data:
+        return data
+    if "template_id" in data:
+        data["templateId"] = data["template_id"]
+    if "is_published" in data:
+        data["isPublished"] = data["is_published"]
+    if "view_count" in data:
+        data["viewCount"] = data["view_count"]
+    return data
+
+
 @router.get("", response_model=List[dict])
 def get_portfolios(client: Client = Depends(get_user_supabase)):
     try:
         res = client.table("portfolios").select("*").order("created_at", desc=True).execute()
-        return res.data
+        return [_format_portfolio(p) for p in (res.data or [])]
     except Exception as e:
         print("get_portfolios error:", e)
         raise HTTPException(status_code=500, detail=str(e))
@@ -41,21 +53,30 @@ def get_portfolio(portfolio_id: str, client: Client = Depends(get_user_supabase)
 
     if not res.data:
         raise HTTPException(status_code=404, detail="Portfolio not found")
-    return res.data
+    return _format_portfolio(res.data)
 
 
 @router.put("/{portfolio_id}", response_model=dict)
 def update_portfolio(portfolio_id: str, data: dict, client: Client = Depends(get_user_supabase)):
-    # Strip unknown / None values before update
-    clean = {k: v for k, v in data.items() if v is not None and k not in ("id", "user_id", "created_at")}
+    key_mapping = {
+        "templateId": "template_id",
+        "isPublished": "is_published",
+        "viewCount": "view_count"
+    }
+    clean = {}
+    for k, v in data.items():
+        if v is not None and k not in ("id", "user_id", "created_at"):
+            clean[key_mapping.get(k, k)] = v
+
     try:
         res = client.table("portfolios").update(clean).eq("id", portfolio_id).execute()
     except Exception as e:
+        print("update_portfolio error:", e)
         raise HTTPException(status_code=500, detail=str(e))
 
     if not res.data:
         raise HTTPException(status_code=404, detail="Portfolio not found")
-    return res.data[0]
+    return _format_portfolio(res.data[0])
 
 
 @router.post("/{portfolio_id}/publish")

@@ -7,6 +7,7 @@ import {
 } from 'lucide-react'
 import type { Portfolio } from '../types/portfolio'
 import { apiClient } from '../lib/apiClient'
+import { getPortfolioPublicUrl } from '../lib/portfolioUrl'
 import { templates, getTemplateById } from '../components/templates'
 
 export default function Editor() {
@@ -163,9 +164,24 @@ export default function Editor() {
       return
     }
     try {
+      // 1. Immediately persist current changes to backend
+      await apiClient.request(`/portfolios/${portfolioId}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          headline: portfolio.headline,
+          summary: portfolio.summary,
+          templateId: portfolio.templateId,
+          slug: portfolio.slug
+        })
+      })
+
+      // 2. Mark published
       await apiClient.request(`/portfolios/${portfolioId}/publish`, { method: 'POST' })
       handleUpdate({ isPublished: true })
-      navigator.clipboard.writeText(`http://localhost:5173/p/${portfolio.slug}`)
+
+      // 3. Copy subdomain link
+      const publicUrl = getPortfolioPublicUrl(portfolio.slug)
+      await navigator.clipboard.writeText(publicUrl)
       setCopied(true)
       setTimeout(() => setCopied(false), 3000)
     } catch (err: any) {
@@ -836,11 +852,11 @@ export default function Editor() {
             </button>
             {portfolio.isPublished && (
               <a
-                href={`/p/${portfolio.slug}`}
+                href={getPortfolioPublicUrl(portfolio.slug)}
                 target="_blank"
                 rel="noreferrer"
                 className="p-1.5 rounded-full bg-white border border-slate-200 text-slate-700 hover:text-black hover:bg-slate-50 transition-colors shadow-2xs"
-                title="Open live portfolio"
+                title={`Open live portfolio (${getPortfolioPublicUrl(portfolio.slug)})`}
               >
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
@@ -849,17 +865,48 @@ export default function Editor() {
         </div>
 
         {/* Live Template Container */}
-        <div className="p-4 sm:p-8 flex justify-center">
-          <div
-            className={`transition-all duration-300 shadow-2xl shadow-slate-300/60 rounded-3xl overflow-hidden border border-slate-200/80 bg-white min-h-[750px] ${
-              viewport === 'mobile' ? 'w-[390px] max-w-full ring-8 ring-slate-900/10' : 'w-full max-w-4xl'
-            }`}
-          >
-            {(() => {
-              const Template = getTemplateById(portfolio.templateId).component
-              return <Template portfolio={portfolio} />
-            })()}
-          </div>
+        <div className="p-4 sm:p-8 flex justify-center items-start">
+          {(() => {
+            const activeTemplateId = portfolio.templateId || (portfolio as any).template_id || 'cosmic-violet'
+            const Template = getTemplateById(activeTemplateId).component
+
+            if (viewport === 'mobile') {
+              return (
+                <div className="w-[390px] h-[780px] max-w-full rounded-[42px] ring-8 ring-slate-900/90 shadow-2xl border-[6px] border-slate-900 overflow-y-auto overflow-x-hidden bg-white flex flex-col relative transition-all duration-300">
+                  {/* Dynamic Island / Speaker Pill */}
+                  <div className="sticky top-0 z-30 w-full flex justify-center py-2.5 bg-slate-950 pointer-events-none shrink-0">
+                    <div className="w-24 h-3.5 bg-black rounded-full border border-slate-800 flex items-center justify-end px-2">
+                      <div className="w-1.5 h-1.5 rounded-full bg-slate-800" />
+                    </div>
+                  </div>
+                  {/* Direct Mobile Viewport Render */}
+                  <div className="w-full flex-1">
+                    <Template portfolio={portfolio} />
+                  </div>
+                </div>
+              )
+            }
+
+            return (
+              <div className="w-full max-w-5xl rounded-2xl shadow-xl border border-slate-200/80 bg-white overflow-hidden transition-all duration-300 min-h-[750px] flex flex-col">
+                {/* Browser Top Bar */}
+                <div className="bg-slate-100/90 border-b border-slate-200 px-4 py-2 flex items-center gap-2">
+                  <div className="flex gap-1.5">
+                    <div className="w-2.5 h-2.5 rounded-full bg-rose-400" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-amber-400" />
+                    <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
+                  </div>
+                  <div className="flex-1 max-w-xs mx-auto bg-white rounded-md px-2.5 py-0.5 text-[11px] text-slate-600 text-center font-mono border border-slate-200 shadow-2xs truncate">
+                    {portfolio.slug}.portfolio.me
+                  </div>
+                </div>
+                {/* Desktop Viewport */}
+                <div className="w-full flex-1">
+                  <Template portfolio={portfolio} />
+                </div>
+              </div>
+            )
+          })()}
         </div>
       </div>
     </div>

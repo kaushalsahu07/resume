@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { Plus, FileText, ArrowRight, ExternalLink, Sparkles, Trash2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { apiClient } from '../lib/apiClient'
+import { getPortfolioPublicUrl } from '../lib/portfolioUrl'
 import type { Portfolio } from '../types/portfolio'
 
 export default function Dashboard() {
@@ -122,14 +123,15 @@ export default function Dashboard() {
                   Edit
                 </Link>
                 {portfolio.isPublished && (
-                  <Link
-                    to={`/p/${portfolio.slug}`}
+                  <a
+                    href={getPortfolioPublicUrl(portfolio.slug)}
                     target="_blank"
+                    rel="noreferrer"
                     className="flex items-center justify-center gap-1.5 px-4 bg-slate-950 hover:bg-slate-800 text-white py-2.5 rounded-xl text-sm font-semibold transition-all hover:shadow-xs"
                   >
                     <span>View</span>
                     <ExternalLink className="w-3.5 h-3.5" />
-                  </Link>
+                  </a>
                 )}
               </div>
             </div>

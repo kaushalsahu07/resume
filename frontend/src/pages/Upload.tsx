@@ -270,7 +270,15 @@ export default function Upload() {
                       <div>
                         <h4 className="font-bold text-base text-slate-900">{t.name}</h4>
                         <span className="text-xs text-slate-400 font-medium">
-                          {t.id === 'fresh-minimal' ? 'Clean & modern typography' : 'High contrast dark theme'}
+                          {t.id === 'fresh-minimal' 
+                            ? 'Clean & modern typography' 
+                            : t.id === 'cosmic-violet'
+                            ? 'Cosmic violet single-page showcase'
+                            : t.id === 'mono-illustrate'
+                            ? 'Monochrome illustration portfolio'
+                            : t.id === 'classic-professional'
+                            ? 'Corporate & executive style'
+                            : 'High contrast dark grid'}
                         </span>
                       </div>
                       {selectedTemplateId === t.id && (

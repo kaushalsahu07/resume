@@ -19,11 +19,20 @@ def get_public_portfolio(slug: str):
 
     portfolio = res.data
 
+    # Map snake_case to camelCase for frontend compatibility
+    if "template_id" in portfolio:
+        portfolio["templateId"] = portfolio["template_id"]
+    if "is_published" in portfolio:
+        portfolio["isPublished"] = portfolio["is_published"]
+    if "view_count" in portfolio:
+        portfolio["viewCount"] = portfolio["view_count"]
+
     # Increment view count (best-effort — don't fail the request if this errors)
     try:
         new_count = portfolio.get("view_count", 0) + 1
         supabase_admin.table("portfolios").update({"view_count": new_count}).eq("id", portfolio["id"]).execute()
         portfolio["view_count"] = new_count
+        portfolio["viewCount"] = new_count
     except Exception as e:
         print("view_count increment failed:", e)
 

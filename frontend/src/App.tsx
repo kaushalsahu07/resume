@@ -7,15 +7,17 @@ import Register from './pages/Register'
 import Dashboard from './pages/Dashboard'
 import Upload from './pages/Upload'
 import Editor from './pages/Editor'
-import PublicPortfolio from './pages/PublicPortfolio'
+import PublicPortfolio, { getSubdomainFromHostname } from './pages/PublicPortfolio'
 import Demo from './pages/Demo'
 
 export default function App() {
+  const subdomain = getSubdomainFromHostname()
+
   return (
     <AuthProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<Landing />} />
+          <Route path="/" element={subdomain ? <PublicPortfolio subdomainSlug={subdomain} /> : <Landing />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/p/:slug" element={<PublicPortfolio />} />
@@ -27,6 +29,9 @@ export default function App() {
             <Route path="/upload" element={<Upload />} />
             <Route path="/editor/:portfolioId" element={<Editor />} />
           </Route>
+
+          {/* Subdomain Catch-All */}
+          {subdomain && <Route path="*" element={<PublicPortfolio subdomainSlug={subdomain} />} />}
         </Routes>
       </BrowserRouter>
     </AuthProvider>
