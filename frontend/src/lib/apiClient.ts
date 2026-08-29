@@ -4,6 +4,8 @@ const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
 // Mock data for development
 const mockUser = { id: '1', email: 'test@example.com', name: 'Test User' }
+let remainingAiRequests = 1000;
+
 
 export const apiClient = {
   async request<T>(endpoint: string, options?: RequestInit): Promise<T> {
@@ -20,6 +22,22 @@ export const apiClient = {
     }
     if (endpoint === '/me') {
       return new Promise((resolve) => setTimeout(() => resolve(mockUser as any), 300))
+    }
+    if (endpoint.includes('/chat')) {
+      const body = options?.body ? JSON.parse(options.body as string) : {};
+      remainingAiRequests = Math.max(0, remainingAiRequests - 1);
+      
+      const newPortfolio = { ...body.currentPortfolio };
+      // Simulate an AI update (just changing the headline to show it works)
+      if (body.message?.toLowerCase().includes('change template')) {
+        newPortfolio.templateId = newPortfolio.templateId === 'fresh-minimal' ? 'classic-professional' : 'fresh-minimal';
+      }
+      
+      return new Promise((resolve) => setTimeout(() => resolve({ 
+        reply: "I have processed your request and updated the portfolio.", 
+        updatedPortfolio: newPortfolio,
+        remainingRequests: remainingAiRequests
+      } as any), 1500))
     }
     
     // REAL REQUEST (uncomment when backend is ready)

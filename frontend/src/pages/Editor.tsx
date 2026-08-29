@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Send, Eye, Edit3, ArrowUp, ArrowDown, Plus, Trash2 } from 'lucide-react'
+import { ArrowLeft, Send, Eye, Edit3, ArrowUp, ArrowDown, Plus, Trash2, MessageSquare, X, Bot } from 'lucide-react'
 import type { Portfolio, Experience, Project, Education, Skill } from '../types/portfolio'
+import { apiClient } from '../lib/apiClient'
+
 import FreshMinimalTemplate from '../components/templates/FreshMinimalTemplate'
 import ClassicProfessionalTemplate from '../components/templates/ClassicProfessionalTemplate'
 
@@ -30,6 +32,14 @@ export default function Editor() {
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null)
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit')
 
+  // Chat & Editor State
+  const [editorMode, setEditorMode] = useState<'manual' | 'chat'>('chat')
+  const [chatInput, setChatInput] = useState('')
+
+  const [chatHistory, setChatHistory] = useState<{role: 'user'|'ai', content: string}[]>([])
+  const [remainingRequests, setRemainingRequests] = useState(1000)
+  const [isChatLoading, setIsChatLoading] = useState(false)
+
   useEffect(() => {
     // In a real app, fetch by portfolioId. Mocking it here.
     setTimeout(() => setPortfolio(initialPortfolio), 300)
@@ -54,9 +64,38 @@ export default function Editor() {
   }
 
   const handlePublish = async () => {
-    if (confirm('Are you sure you want to publish your portfolio?')) {
-      handleUpdate({ isPublished: true, slug: 'john-doe-' + Math.floor(Math.random()*1000) })
-      alert(`Published! URL: /p/${portfolio.slug}`)
+    if (!portfolio.slug) {
+      alert("Please enter a custom URL slug before publishing.");
+      return;
+    }
+    if (confirm(`Are you sure you want to publish your portfolio to ${portfolio.slug}.portfolio.me?`)) {
+      handleUpdate({ isPublished: true })
+      alert(`Published! URL: https://${portfolio.slug}.portfolio.me`)
+    }
+  }
+
+  const handleChatSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!chatInput.trim() || remainingRequests <= 0) return
+
+    const userMsg = chatInput.trim()
+    setChatInput('')
+    setChatHistory(prev => [...prev, { role: 'user', content: userMsg }])
+    setIsChatLoading(true)
+
+    try {
+      const res = await apiClient.request<{reply: string, updatedPortfolio: Portfolio, remainingRequests: number}>(`/portfolios/${portfolioId}/chat`, {
+        method: 'POST',
+        body: JSON.stringify({ message: userMsg, currentPortfolio: portfolio })
+      })
+
+      setChatHistory(prev => [...prev, { role: 'ai', content: res.reply }])
+      setPortfolio(res.updatedPortfolio)
+      setRemainingRequests(res.remainingRequests)
+    } catch (err) {
+      setChatHistory(prev => [...prev, { role: 'ai', content: 'Sorry, I encountered an error.' }])
+    } finally {
+      setIsChatLoading(false)
     }
   }
 
@@ -82,37 +121,53 @@ export default function Editor() {
       <div className={`flex-1 flex flex-col bg-background border-r border-border overflow-hidden ${activeTab === 'preview' ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-border flex justify-between items-center shrink-0">
           <button onClick={() => navigate('/dashboard')} className="flex items-center gap-2 text-sm font-medium text-muted-foreground hover:text-foreground transition-colors">
-            <ArrowLeft className="w-4 h-4" /> Dashboard
+            <ArrowLeft className="w-4 h-4" />
+            <span className="hidden sm:inline">Dashboard</span>
           </button>
-          <button onClick={handlePublish} className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2 rounded-md text-sm font-medium hover:opacity-90 transition-opacity">
-            <Send className="w-4 h-4" /> Publish
-          </button>
+          
+          <div className="flex bg-muted/50 p-1 rounded-lg">
+            <button 
+              onClick={() => setEditorMode('manual')} 
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all ${editorMode === 'manual' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              Manual Edit
+            </button>
+            <button 
+              onClick={() => setEditorMode('chat')} 
+              className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all flex items-center gap-1.5 ${editorMode === 'chat' ? 'bg-background shadow-sm text-foreground' : 'text-muted-foreground hover:text-foreground'}`}
+            >
+              <Bot className="w-4 h-4" />
+              AI Chat
+            </button>
+          </div>
+          <div className="w-16"></div> {/* Spacer to balance Dashboard button */}
         </div>
         
-        <div className="flex-1 overflow-y-auto p-6 space-y-8">
-          <section>
-            <h3 className="font-bold text-lg mb-4">Template</h3>
-            <select 
-              className="w-full p-2 border border-border rounded-md bg-background"
-              value={portfolio.templateId}
-              onChange={(e) => handleUpdate({ templateId: e.target.value as any })}
-            >
-              <option value="fresh-minimal">Fresh Minimal</option>
-              <option value="classic-professional">Classic Professional</option>
-            </select>
-          </section>
+        {editorMode === 'manual' ? (
+          <div className="flex-1 overflow-y-auto p-6 space-y-8">
+            <section>
+              <h3 className="font-bold text-lg mb-4">Template</h3>
+              <select 
+                className="w-full p-2 border border-border rounded-md bg-background"
+                value={portfolio.templateId}
+                onChange={(e) => handleUpdate({ templateId: e.target.value as any })}
+              >
+                <option value="fresh-minimal">Fresh Minimal</option>
+                <option value="classic-professional">Classic Professional</option>
+              </select>
+            </section>
 
-          <section>
-            <h3 className="font-bold text-lg mb-4">Header</h3>
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm mb-1 font-medium">Headline / Name</label>
-                <input 
-                  type="text" className="w-full p-2 border border-border rounded-md" 
-                  value={portfolio.headline || ''} onChange={e => handleUpdate({ headline: e.target.value })}
-                />
-              </div>
-              <div>
+            <section>
+              <h3 className="font-bold text-lg mb-4">Header</h3>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm mb-1 font-medium">Headline / Name</label>
+                  <input 
+                    type="text" className="w-full p-2 border border-border rounded-md" 
+                    value={portfolio.headline || ''} onChange={e => handleUpdate({ headline: e.target.value })}
+                  />
+                </div>
+                <div>
                 <label className="block text-sm mb-1 font-medium">Summary</label>
                 <textarea 
                   className="w-full p-2 border border-border rounded-md h-24" 
@@ -122,62 +177,143 @@ export default function Editor() {
             </div>
           </section>
 
-          <section>
-            <h3 className="font-bold text-lg mb-4 flex justify-between items-center">
-              Experience
-              <button className="text-primary text-sm font-medium flex items-center gap-1">
-                <Plus className="w-4 h-4" /> Add
-              </button>
-            </h3>
-            <div className="space-y-4">
-              {portfolio.experience.map((exp, idx) => (
-                <div key={exp.id} className="border border-border rounded-md p-4 space-y-3 bg-muted/10">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="font-medium text-sm text-muted-foreground">Item {idx + 1}</span>
-                    <div className="flex gap-1">
-                      <button onClick={() => moveItem('experience', idx, 'up')} disabled={idx === 0} className="p-1 hover:bg-muted rounded disabled:opacity-30"><ArrowUp className="w-4 h-4" /></button>
-                      <button onClick={() => moveItem('experience', idx, 'down')} disabled={idx === portfolio.experience.length - 1} className="p-1 hover:bg-muted rounded disabled:opacity-30"><ArrowDown className="w-4 h-4" /></button>
-                      <button className="p-1 text-red-500 hover:bg-red-50 rounded ml-2"><Trash2 className="w-4 h-4" /></button>
+            <section>
+              <h3 className="font-bold text-lg mb-4 flex justify-between items-center">
+                Experience
+                <button className="text-primary text-sm font-medium flex items-center gap-1">
+                  <Plus className="w-4 h-4" /> Add
+                </button>
+              </h3>
+              <div className="space-y-4">
+                {portfolio.experience.map((exp, idx) => (
+                  <div key={exp.id} className="border border-border rounded-md p-4 space-y-3 bg-muted/10">
+                    <div className="flex justify-between items-center mb-2">
+                      <span className="font-medium text-sm text-muted-foreground">Item {idx + 1}</span>
+                      <div className="flex gap-1">
+                        <button onClick={() => moveItem('experience', idx, 'up')} disabled={idx === 0} className="p-1 hover:bg-muted rounded disabled:opacity-30"><ArrowUp className="w-4 h-4" /></button>
+                        <button onClick={() => moveItem('experience', idx, 'down')} disabled={idx === portfolio.experience.length - 1} className="p-1 hover:bg-muted rounded disabled:opacity-30"><ArrowDown className="w-4 h-4" /></button>
+                        <button className="p-1 text-red-500 hover:bg-red-50 rounded ml-2"><Trash2 className="w-4 h-4" /></button>
+                      </div>
                     </div>
+                    <input type="text" placeholder="Company" className="w-full p-2 text-sm border border-border rounded-md" value={exp.company} 
+                      onChange={e => {
+                        const newExp = [...portfolio.experience]
+                        newExp[idx].company = e.target.value
+                        handleUpdate({ experience: newExp })
+                      }}
+                    />
+                    <input type="text" placeholder="Role" className="w-full p-2 text-sm border border-border rounded-md" value={exp.role} 
+                      onChange={e => {
+                        const newExp = [...portfolio.experience]
+                        newExp[idx].role = e.target.value
+                        handleUpdate({ experience: newExp })
+                      }}
+                    />
+                    <div className="flex gap-2">
+                      <input type="text" placeholder="Start Date" className="w-1/2 p-2 text-sm border border-border rounded-md" value={exp.startDate || ''} />
+                      <input type="text" placeholder="End Date" className="w-1/2 p-2 text-sm border border-border rounded-md" value={exp.endDate || ''} />
+                    </div>
+                    <textarea placeholder="Description" className="w-full p-2 text-sm border border-border rounded-md h-20" value={exp.description || ''} 
+                      onChange={e => {
+                        const newExp = [...portfolio.experience]
+                        newExp[idx].description = e.target.value
+                        handleUpdate({ experience: newExp })
+                      }}
+                    />
                   </div>
-                  <input type="text" placeholder="Company" className="w-full p-2 text-sm border border-border rounded-md" value={exp.company} 
-                    onChange={e => {
-                      const newExp = [...portfolio.experience]
-                      newExp[idx].company = e.target.value
-                      handleUpdate({ experience: newExp })
-                    }}
-                  />
-                  <input type="text" placeholder="Role" className="w-full p-2 text-sm border border-border rounded-md" value={exp.role} 
-                    onChange={e => {
-                      const newExp = [...portfolio.experience]
-                      newExp[idx].role = e.target.value
-                      handleUpdate({ experience: newExp })
-                    }}
-                  />
-                  <div className="flex gap-2">
-                    <input type="text" placeholder="Start Date" className="w-1/2 p-2 text-sm border border-border rounded-md" value={exp.startDate || ''} />
-                    <input type="text" placeholder="End Date" className="w-1/2 p-2 text-sm border border-border rounded-md" value={exp.endDate || ''} />
+                ))}
+              </div>
+            </section>
+          </div>
+        ) : (
+          <div className="flex-1 flex flex-col bg-muted/10 overflow-hidden">
+            <div className="p-4 border-b border-border/50 bg-background/50 flex justify-between items-center shrink-0">
+              <span className="text-sm font-medium text-muted-foreground flex items-center gap-2">
+                <MessageSquare className="w-4 h-4" /> Let AI update your portfolio
+              </span>
+              <span className="text-xs px-2 py-1 bg-primary/10 text-primary rounded-full font-medium">
+                {remainingRequests} requests left
+              </span>
+            </div>
+            
+            <div className="flex-1 overflow-y-auto p-4 space-y-4">
+              {chatHistory.length === 0 && (
+                <div className="flex flex-col items-center justify-center h-full text-center space-y-3 opacity-60">
+                  <Bot className="w-12 h-12 text-primary" />
+                  <div>
+                    <p className="font-medium">I'm your Portfolio AI</p>
+                    <p className="text-sm text-muted-foreground">Ask me to change your template, rewrite your summary, or add new skills!</p>
                   </div>
-                  <textarea placeholder="Description" className="w-full p-2 text-sm border border-border rounded-md h-20" value={exp.description || ''} 
-                    onChange={e => {
-                      const newExp = [...portfolio.experience]
-                      newExp[idx].description = e.target.value
-                      handleUpdate({ experience: newExp })
-                    }}
-                  />
+                </div>
+              )}
+              {chatHistory.map((msg, i) => (
+                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                  <div className={`max-w-[85%] p-3 rounded-xl text-sm ${msg.role === 'user' ? 'bg-primary text-primary-foreground rounded-tr-sm' : 'bg-background shadow-sm border border-border rounded-tl-sm'}`}>
+                    {msg.content}
+                  </div>
                 </div>
               ))}
+              {isChatLoading && (
+                <div className="flex justify-start">
+                  <div className="max-w-[85%] p-3 rounded-xl text-sm bg-background shadow-sm border border-border rounded-tl-sm flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce [animation-delay:-0.3s]"></span>
+                    <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce [animation-delay:-0.15s]"></span>
+                    <span className="w-1.5 h-1.5 bg-primary/60 rounded-full animate-bounce"></span>
+                  </div>
+                </div>
+              )}
             </div>
-          </section>
-        </div>
+
+            <div className="p-4 bg-background border-t border-border shrink-0">
+              <form onSubmit={handleChatSubmit} className="flex gap-2">
+                <input 
+                  type="text" 
+                  placeholder={remainingRequests > 0 ? "E.g. Change template to classic professional..." : "Limit reached"} 
+                  className="flex-1 p-3 border border-border rounded-lg text-sm bg-muted/30 focus:bg-background transition-colors outline-none focus:ring-2 focus:ring-primary/20"
+                  value={chatInput}
+                  onChange={e => setChatInput(e.target.value)}
+                  disabled={remainingRequests <= 0 || isChatLoading}
+                />
+                <button 
+                  type="submit"
+                  disabled={!chatInput.trim() || remainingRequests <= 0 || isChatLoading}
+                  className="bg-primary text-primary-foreground p-3 rounded-lg disabled:opacity-50 hover:opacity-90 transition-opacity"
+                >
+                  <Send className="w-5 h-5" />
+                </button>
+              </form>
+            </div>
+          </div>
+        )}
       </div>
+
 
       {/* Preview Pane */}
       <div className={`flex-1 md:flex-[1.5] overflow-y-auto bg-muted/30 ${activeTab === 'edit' ? 'hidden md:block' : 'block'}`}>
-        <div className="p-4 flex justify-center sticky top-0 bg-background/80 backdrop-blur-sm border-b border-border/50 z-10">
-          <span className="text-sm font-medium text-muted-foreground flex items-center gap-2">
-            <Eye className="w-4 h-4" /> Live Preview
-          </span>
+        <div className="p-3 flex justify-between items-center sticky top-0 bg-background/80 backdrop-blur-sm border-b border-border/50 z-10">
+          <div className="hidden sm:flex items-center gap-2 text-sm font-medium text-muted-foreground w-32 shrink-0">
+            <Eye className="w-4 h-4" /> Preview
+          </div>
+          
+          <div className="flex justify-center flex-1">
+            <div className="flex items-center gap-1.5">
+              <input 
+                type="text" 
+                className="bg-muted/30 border border-border rounded-md px-2 py-1.5 text-sm outline-none focus:ring-2 focus:ring-primary/20 transition-all text-foreground font-medium w-[120px] sm:w-[160px]"
+                value={portfolio.slug || ''} 
+                onChange={e => handleUpdate({ slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') })}
+                placeholder="yourname"
+              />
+              <span className="text-muted-foreground text-sm font-medium whitespace-nowrap">.portfolio.me</span>
+            </div>
+          </div>
+
+          <div className="w-32 flex justify-end shrink-0">
+            <button onClick={handlePublish} className="flex items-center gap-2 bg-primary text-primary-foreground px-4 py-1.5 rounded-md text-sm font-medium hover:opacity-90 transition-opacity">
+              <Send className="w-4 h-4" />
+              <span className="hidden sm:inline">Publish</span>
+            </button>
+          </div>
         </div>
         <div className="p-4 md:p-8">
           <div className="bg-background shadow-lg rounded-xl overflow-hidden border border-border/50 min-h-[800px]">
@@ -189,6 +325,8 @@ export default function Editor() {
           </div>
         </div>
       </div>
+
     </div>
   )
 }
+
