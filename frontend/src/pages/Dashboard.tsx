@@ -11,9 +11,7 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchPortfolios = async () => {
       try {
-        // Mocking API call for now
-        // const data = await apiClient.request<Portfolio[]>('/portfolios')
-        const data: Portfolio[] = []
+        const data = await apiClient.request<Portfolio[]>('/portfolios')
         setPortfolios(data)
       } catch (err) {
         console.error(err)

@@ -1,6 +1,9 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Upload as UploadIcon, FileText, CheckCircle2, Loader2, X } from 'lucide-react'
+import { templates } from '../components/templates'
+import { apiClient } from '../lib/apiClient'
+import type { Portfolio } from '../types/portfolio'
 
 type UploadState = 'idle' | 'uploading' | 'extracting' | 'structuring' | 'done' | 'error'
 
@@ -8,6 +11,13 @@ export default function Upload() {
   const [file, setFile] = useState<File | null>(null)
   const [state, setState] = useState<UploadState>('idle')
   const [errorMsg, setErrorMsg] = useState('')
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>('')
+
+  useEffect(() => {
+    if (templates.length > 0 && !selectedTemplateId) {
+      setSelectedTemplateId(templates[0].id)
+    }
+  }, [selectedTemplateId])
   const fileInputRef = useRef<HTMLInputElement>(null)
   const navigate = useNavigate()
 
@@ -31,22 +41,49 @@ export default function Upload() {
     setErrorMsg('')
   }
 
-  const simulateProcessing = async () => {
+  const processUpload = async () => {
+    if (!file) return;
+    
     setState('uploading')
-    await new Promise(r => setTimeout(r, 1000))
-    setState('extracting')
-    await new Promise(r => setTimeout(r, 1500))
-    setState('structuring')
-    await new Promise(r => setTimeout(r, 2000))
-    setState('done')
-    await new Promise(r => setTimeout(r, 500))
-    // Mock navigating to new portfolio ID
-    navigate('/editor/mock-portfolio-id')
+    
+    // We don't have granular progress from the fetch API easily, so we simulate the 
+    // visual loading states while waiting for the single API request to finish.
+    const loadingStates = ['uploading', 'extracting', 'structuring'] as const;
+    let currentStateIndex = 0;
+    const interval = setInterval(() => {
+      if (currentStateIndex < loadingStates.length - 1) {
+        currentStateIndex++;
+        setState(loadingStates[currentStateIndex]);
+      }
+    }, 2000);
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      
+      const portfolio = await apiClient.request<Portfolio>('/resume/upload', {
+        method: 'POST',
+        body: formData
+      });
+      
+      clearInterval(interval);
+      setState('done');
+      
+      // Briefly show done state
+      setTimeout(() => {
+        navigate(`/editor/${portfolio.id}`, { state: { templateId: selectedTemplateId, portfolio } })
+      }, 500);
+      
+    } catch (err: any) {
+      clearInterval(interval);
+      setState('error');
+      setErrorMsg(err.message || 'Failed to process resume');
+    }
   }
 
   const handleUpload = () => {
     if (!file) return
-    simulateProcessing()
+    processUpload()
   }
 
   return (
@@ -89,6 +126,38 @@ export default function Upload() {
                 {file ? `${(file.size / 1024 / 1024).toFixed(2)} MB` : 'PDF or DOCX (max 10MB)'}
               </p>
             </div>
+
+            {file && (
+              <div className="w-full mt-8 text-left animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <label className="block text-sm font-semibold mb-4 text-foreground">Choose a Starting Template</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {templates.map(t => (
+                    <div 
+                      key={t.id}
+                      onClick={() => setSelectedTemplateId(t.id)}
+                      className={`cursor-pointer rounded-2xl border-2 transition-all overflow-hidden flex flex-col bg-background ${
+                        selectedTemplateId === t.id 
+                          ? 'border-primary shadow-md ring-2 ring-primary/20' 
+                          : 'border-border hover:border-primary/50 hover:shadow-sm'
+                      }`}
+                    >
+                      <div className="flex-1 bg-muted/30 p-4 flex items-center justify-center min-h-[200px]">
+                        {t.thumbnail ? (
+                          <img src={t.thumbnail} alt={t.name} className="w-full h-full object-cover rounded-md border border-border/50 shadow-sm" />
+                        ) : (
+                          <div className="w-full h-full border-2 border-dashed border-border/50 rounded-md flex items-center justify-center text-muted-foreground text-sm font-medium">
+                            Preview not available
+                          </div>
+                        )}
+                      </div>
+                      <div className="p-4 border-t border-border/50 bg-background">
+                        <h4 className="font-bold text-lg">{t.name}</h4>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <button 
               className="mt-8 w-full bg-primary text-primary-foreground py-3 rounded-md font-medium text-lg hover:opacity-90 transition-opacity disabled:opacity-50 disabled:cursor-not-allowed"

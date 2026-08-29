@@ -151,6 +151,15 @@ src/
 - **Upload screen:** show a real progress/status sequence (uploading → extracting text →
   structuring with AI → done) rather than a single spinner — this is the "AI Magic" moment and
   is worth a bit of polish since it's the product's core differentiator.
+- **Upload → Editor handoff:** `POST /resume/upload` returns the complete populated `Portfolio`
+  object in one response. On success, store it (e.g. in the `usePortfolio` hook's state or a
+  query cache keyed by `portfolioId`) and navigate straight to `/editor/:portfolioId` — do not
+  show a separate "review extracted data" screen first. Every form field and every section list
+  in the editor must render already filled in from that response the instant the editor mounts;
+  the preview pane should show a complete portfolio, not an empty one waiting for input. Each
+  extracted item already has a real `id` from the backend, so any edit the user makes calls
+  `PUT .../{itemId}` (never `POST`, which would create a duplicate row) — only genuinely new
+  items the user adds by hand use `POST`.
 - **Editor:** two-pane layout on desktop (form controls left, live preview right), tab-switch
   between edit/preview on mobile. Every add/edit/delete/reorder action should reflect in the
   preview pane instantly (optimistic UI), then persist to the backend.

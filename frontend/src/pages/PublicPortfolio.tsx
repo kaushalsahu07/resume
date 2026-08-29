@@ -2,8 +2,7 @@ import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { apiClient } from '../lib/apiClient'
 import type { Portfolio } from '../types/portfolio'
-import FreshMinimalTemplate from '../components/templates/FreshMinimalTemplate'
-import ClassicProfessionalTemplate from '../components/templates/ClassicProfessionalTemplate'
+import { getTemplateById } from '../components/templates'
 import { Loader2 } from 'lucide-react'
 
 export default function PublicPortfolio() {
@@ -15,12 +14,8 @@ export default function PublicPortfolio() {
   useEffect(() => {
     const fetchPortfolio = async () => {
       try {
-        // Mock fetch for public portfolio by slug
-        // const data = await apiClient.request<Portfolio>(`/p/${slug}`)
-        // Mocking failure since backend is not there, or we could just show the demo mock
-        // For testing purposes, we'll wait a bit and show error to pretend it's live
-        await new Promise(resolve => setTimeout(resolve, 800))
-        throw new Error('Not found')
+        const data = await apiClient.request<Portfolio>(`/p/${slug}`)
+        setPortfolio(data)
       } catch (err) {
         setError(true)
       } finally {
@@ -47,12 +42,14 @@ export default function PublicPortfolio() {
     )
   }
 
+  const TemplateComponent = getTemplateById(portfolio.templateId)?.component
+
   return (
     <div className="min-h-screen">
-      {portfolio.templateId === 'classic-professional' ? (
-        <ClassicProfessionalTemplate portfolio={portfolio} />
+      {TemplateComponent ? (
+        <TemplateComponent portfolio={portfolio} />
       ) : (
-        <FreshMinimalTemplate portfolio={portfolio} />
+        <div className="p-8 text-center text-red-500">Template not found</div>
       )}
     </div>
   )

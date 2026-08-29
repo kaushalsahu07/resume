@@ -1,34 +1,17 @@
 import { useState, useEffect } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { ArrowLeft, Send, Eye, Edit3, ArrowUp, ArrowDown, Plus, Trash2, MessageSquare, X, Bot } from 'lucide-react'
 import type { Portfolio, Experience, Project, Education, Skill } from '../types/portfolio'
 import { apiClient } from '../lib/apiClient'
 
-import FreshMinimalTemplate from '../components/templates/FreshMinimalTemplate'
-import ClassicProfessionalTemplate from '../components/templates/ClassicProfessionalTemplate'
+import { templates, getTemplateById } from '../components/templates'
+// initialPortfolio is no longer needed as we fetch from API
 
-// Mock initial data for editor
-const initialPortfolio: Portfolio = {
-  id: 'mock-portfolio-id',
-  slug: 'my-portfolio',
-  templateId: 'fresh-minimal',
-  headline: 'John Doe',
-  summary: 'Software Developer',
-  isPublished: false,
-  viewCount: 0,
-  education: [],
-  experience: [
-    { id: 'exp-1', company: 'Acme Corp', role: 'Developer', startDate: '2020', order: 0 }
-  ],
-  projects: [],
-  skills: [{ id: 'sk-1', name: 'React' }],
-  achievements: [],
-  links: []
-}
 
 export default function Editor() {
   const { portfolioId } = useParams()
   const navigate = useNavigate()
+  const location = useLocation()
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null)
   const [activeTab, setActiveTab] = useState<'edit' | 'preview'>('edit')
 
@@ -41,9 +24,38 @@ export default function Editor() {
   const [isChatLoading, setIsChatLoading] = useState(false)
 
   useEffect(() => {
-    // In a real app, fetch by portfolioId. Mocking it here.
-    setTimeout(() => setPortfolio(initialPortfolio), 300)
-  }, [portfolioId])
+    if (location.state?.portfolio) {
+      setPortfolio(location.state.portfolio)
+      return
+    }
+
+    if (portfolioId) {
+      apiClient.request<Portfolio>(`/portfolios/${portfolioId}`)
+        .then(data => {
+          setPortfolio(data)
+        })
+        .catch(err => {
+          console.error("Failed to load portfolio:", err)
+        })
+    }
+  }, [portfolioId, location.state])
+
+  // Simple debounced save for root fields (headline, summary, templateId)
+  useEffect(() => {
+    if (!portfolio || !portfolioId) return;
+    const timer = setTimeout(() => {
+      apiClient.request(`/portfolios/${portfolioId}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          headline: portfolio.headline,
+          summary: portfolio.summary,
+          templateId: portfolio.templateId,
+          slug: portfolio.slug
+        })
+      }).catch(err => console.error("Auto-save failed", err))
+    }, 1000);
+    return () => clearTimeout(timer);
+  }, [portfolio?.headline, portfolio?.summary, portfolio?.templateId, portfolio?.slug])
 
   if (!portfolio) {
     return <div className="p-8">Loading editor...</div>
@@ -69,8 +81,13 @@ export default function Editor() {
       return;
     }
     if (confirm(`Are you sure you want to publish your portfolio to ${portfolio.slug}.portfolio.me?`)) {
-      handleUpdate({ isPublished: true })
-      alert(`Published! URL: https://${portfolio.slug}.portfolio.me`)
+      try {
+        await apiClient.request(`/portfolios/${portfolioId}/publish`, { method: 'POST' })
+        handleUpdate({ isPublished: true })
+        alert(`Published! URL: http://localhost:5173/p/${portfolio.slug}`)
+      } catch (err: any) {
+        alert(err.message || 'Failed to publish')
+      }
     }
   }
 
@@ -152,8 +169,9 @@ export default function Editor() {
                 value={portfolio.templateId}
                 onChange={(e) => handleUpdate({ templateId: e.target.value as any })}
               >
-                <option value="fresh-minimal">Fresh Minimal</option>
-                <option value="classic-professional">Classic Professional</option>
+                {templates.map(t => (
+                  <option key={t.id} value={t.id}>{t.name}</option>
+                ))}
               </select>
             </section>
 
@@ -317,11 +335,10 @@ export default function Editor() {
         </div>
         <div className="p-4 md:p-8">
           <div className="bg-background shadow-lg rounded-xl overflow-hidden border border-border/50 min-h-[800px]">
-            {portfolio.templateId === 'classic-professional' ? (
-              <ClassicProfessionalTemplate portfolio={portfolio} />
-            ) : (
-              <FreshMinimalTemplate portfolio={portfolio} />
-            )}
+            {(() => {
+              const Template = getTemplateById(portfolio.templateId).component;
+              return <Template portfolio={portfolio} />;
+            })()}
           </div>
         </div>
       </div>

@@ -16,13 +16,6 @@ export const apiClient = {
       headers.set('Content-Type', 'application/json')
     }
 
-    // MOCK RESPONSES FOR NOW
-    if (endpoint === '/auth/login' || endpoint === '/auth/register') {
-      return new Promise((resolve) => setTimeout(() => resolve({ token: 'mock-token', user: mockUser } as any), 500))
-    }
-    if (endpoint === '/me') {
-      return new Promise((resolve) => setTimeout(() => resolve(mockUser as any), 300))
-    }
     if (endpoint.includes('/chat')) {
       const body = options?.body ? JSON.parse(options.body as string) : {};
       remainingAiRequests = Math.max(0, remainingAiRequests - 1);
@@ -40,16 +33,12 @@ export const apiClient = {
       } as any), 1500))
     }
     
-    // REAL REQUEST (uncomment when backend is ready)
-    /*
+    // REAL REQUEST
     const response = await fetch(`${BASE_URL}${endpoint}`, { ...options, headers })
     if (!response.ok) {
       const error = await response.json().catch(() => ({ message: 'API Error' }))
-      throw new Error(error.message || 'API Error')
+      throw new Error(error.detail || error.message || 'API Error')
     }
     return response.json()
-    */
-    
-    return {} as T
   }
 }

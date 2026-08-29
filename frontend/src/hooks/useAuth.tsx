@@ -22,7 +22,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const token = authStorage.getToken()
       if (token) {
         try {
-          const user = await apiClient.request<User>('/me')
+          const user = await apiClient.request<User>('/auth/me')
           setUser(user)
         } catch (e) {
           authStorage.clearToken()
