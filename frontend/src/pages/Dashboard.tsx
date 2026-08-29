@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { Plus, FileText, ArrowRight, ExternalLink, Sparkles } from 'lucide-react'
+import { Plus, FileText, ArrowRight, ExternalLink, Sparkles, Trash2 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { apiClient } from '../lib/apiClient'
 import type { Portfolio } from '../types/portfolio'
@@ -21,6 +21,23 @@ export default function Dashboard() {
     }
     fetchPortfolios()
   }, [])
+
+  const handleDelete = async (id: string, e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    if (!window.confirm('Are you sure you want to delete this portfolio? This action cannot be undone.')) {
+      return
+    }
+    
+    try {
+      await apiClient.request(`/portfolios/${id}`, { method: 'DELETE' })
+      setPortfolios(prev => prev.filter(p => p.id !== id))
+    } catch (err) {
+      console.error('Failed to delete portfolio:', err)
+      alert('Failed to delete portfolio. Please try again.')
+    }
+  }
 
   if (loading) return (
     <div className="flex-1 flex items-center justify-center p-12 text-slate-500 font-medium">
@@ -76,9 +93,18 @@ export default function Dashboard() {
                   <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${portfolio.isPublished ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 'bg-slate-100 text-slate-600 border border-slate-200'}`}>
                     {portfolio.isPublished ? 'Published' : 'Draft'}
                   </span>
-                  <span className="text-xs text-slate-400 font-medium">
-                    {portfolio.viewCount} views
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-slate-400 font-medium">
+                      {portfolio.viewCount} views
+                    </span>
+                    <button
+                      onClick={(e) => handleDelete(portfolio.id, e)}
+                      className="text-slate-400 hover:text-red-500 transition-colors p-1 rounded-md hover:bg-red-50"
+                      title="Delete portfolio"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
                 </div>
                 <h3 className="font-display font-bold text-xl text-slate-900 mb-1 group-hover:text-black transition-colors">
                   {portfolio.slug || 'Untitled Portfolio'}

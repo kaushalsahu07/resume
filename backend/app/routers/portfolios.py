@@ -2,6 +2,7 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Header, status
 from app.core.auth import get_current_user
 from app.core.config import settings
+from app.core.supabase_client import supabase_admin
 from supabase import create_client, Client
 from pydantic import BaseModel
 
@@ -83,10 +84,21 @@ def unpublish_portfolio(portfolio_id: str, client: Client = Depends(get_user_sup
 
 @router.delete("/{portfolio_id}", status_code=status.HTTP_204_NO_CONTENT)
 def delete_portfolio(portfolio_id: str, client: Client = Depends(get_user_supabase)):
+    # 1. Verify ownership using the user's authenticated client (RLS enforced)
+    res = client.table("portfolios").select("id").eq("id", portfolio_id).execute()
+    if not res.data:
+        raise HTTPException(status_code=404, detail="Portfolio not found or not owned by user")
+    
+    # 2. Delete using admin client to bypass any missing DELETE RLS policies
     try:
-        client.table("portfolios").delete().eq("id", portfolio_id).execute()
+        # Delete children explicitly in case ON DELETE CASCADE is not configured
+        for table in ALLOWED_SECTIONS:
+            supabase_admin.table(table).delete().eq("portfolio_id", portfolio_id).execute()
+        
+        # Delete the main portfolio
+        supabase_admin.table("portfolios").delete().eq("id", portfolio_id).execute()
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        raise HTTPException(status_code=500, detail=f"Database deletion failed: {str(e)}")
 
 
 # ─── Child Section CRUD ───────────────────────────────────────────────────────

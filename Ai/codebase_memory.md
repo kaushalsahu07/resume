@@ -101,8 +101,14 @@ User Action (Sends Message) ↓ API (POST `/portfolios/:id/chat`) ↓ Backend (A
 - **Public Portfolio Viewer**: Renders the chosen template for a published portfolio.
 
 ## Technical Debt / Known Risks
-- API client is currently mocking responses (needs to be connected to the real backend).
-- AI parsing logic relies entirely on the external backend.
+- AI parsing relies entirely on the external backend and requires handling markdown-wrapped JSON gracefully. (Addressed with robust `_clean_json` payload extraction).
+- Groq free tier imposes strict TPM limits (8000 tokens), which requires careful `max_tokens` configuration to prevent `413 Request Entity Too Large` errors. (Addressed by keeping `max_tokens=2048`).
+
+## Recent Updates
+- **AI Providers Switched**: Anthropic (Claude) has been completely removed from the project in favor of Groq (primary, using `qwen/qwen3.8-27b`) with fallback to Gemini (using `gemini-3.6-flash`).
+- **Robust JSON Extraction**: Improved the `_clean_json` method to safely extract JSON payloads even when AI models ignore system prompts and output conversational text or markdown code fences.
+- **Dashboard Delete Bug Fix**: Fixed an issue where the frontend hit an unhandled `204 No Content` error, and bypassed Supabase user-side RLS limitations by utilizing `supabase_admin` to securely delete portfolios (after verifying ownership) and explicitly dropping child section rows.
+- **API Connection**: The frontend `apiClient.ts` has been connected to the live backend; it is no longer mocking responses.
 
 ## Development Workflow
 1. Run `npm run dev` in the `frontend` directory.
@@ -114,5 +120,5 @@ User Action (Sends Message) ↓ API (POST `/portfolios/:id/chat`) ↓ Backend (A
 - `netlify.toml` handles SPA redirects (`/* /index.html 200`).
 
 ## Future Recommendations
-- Connect `apiClient.ts` to the live backend once deployed.
-- Implement robust error handling for failed AI parsing.
+- Add additional templates and layout options.
+- Implement robust analytics for public portfolio views.

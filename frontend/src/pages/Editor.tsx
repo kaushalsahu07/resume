@@ -3,7 +3,7 @@ import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { 
   ArrowLeft, Send, Eye, Edit3, ArrowUp, ArrowDown, Plus, Trash2, 
   Bot, Sparkles, Check, ExternalLink, 
-  Monitor, Smartphone, ChevronDown, ChevronUp, Wand2
+  Monitor, Smartphone, ChevronDown, ChevronUp, Wand2, Zap
 } from 'lucide-react'
 import type { Portfolio } from '../types/portfolio'
 import { apiClient } from '../lib/apiClient'
@@ -25,6 +25,7 @@ export default function Editor() {
   const [copied, setCopied] = useState(false)
   const [viewport, setViewport] = useState<'desktop' | 'mobile'>('desktop')
   const [newSkillInput, setNewSkillInput] = useState('')
+  const [aiProvider, setAiProvider] = useState<'groq' | 'gemini'>('groq')
 
   // Accordion open states
   const [openSections, setOpenSections] = useState({
@@ -180,16 +181,17 @@ export default function Editor() {
     setIsChatLoading(true)
 
     try {
-      const res = await apiClient.request<{ reply: string; updatedPortfolio: Portfolio; remainingRequests: number }>(
+      const res = await apiClient.request<{ reply: string; updatedPortfolio: Portfolio; remainingRequests: number; provider: string }>(
         `/portfolios/${portfolioId}/chat`,
         {
           method: 'POST',
-          body: JSON.stringify({ message: msg, currentPortfolio: portfolio })
+          body: JSON.stringify({ message: msg, currentPortfolio: portfolio, provider: aiProvider })
         }
       )
 
-      setChatHistory(prev => [...prev, { role: 'ai', content: res.reply }])
-      setPortfolio(res.updatedPortfolio)
+      const providerLabel = res.provider === 'groq' ? '⚡ Groq' : '💎 Gemini'
+      setChatHistory(prev => [...prev, { role: 'ai', content: `${res.reply}\n\n_Powered by ${providerLabel}_` }])
+      setPortfolio(res.updatedPortfolio as Portfolio)
       setRemainingRequests(res.remainingRequests)
     } catch {
       setChatHistory(prev => [...prev, { role: 'ai', content: 'Sorry, I encountered an issue updating your portfolio. Please try again.' }])
@@ -284,13 +286,39 @@ export default function Editor() {
         {editorMode === 'chat' ? (
           <div className="flex-1 flex flex-col bg-slate-50/40 overflow-hidden">
             {/* AI Assistant Banner */}
-            <div className="p-3 border-b border-slate-200/60 bg-white flex justify-between items-center shrink-0">
-              <span className="text-xs font-semibold text-slate-600 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-blue-600" /> Ask AI to modify any part of your portfolio
+            <div className="p-3 border-b border-slate-200/60 bg-white flex justify-between items-center shrink-0 gap-2">
+              <span className="text-xs font-semibold text-slate-600 flex items-center gap-1.5 shrink-0">
+                <Sparkles className="w-3.5 h-3.5 text-blue-600" /> AI Editor
               </span>
-              <span className="text-[11px] px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full font-semibold border border-slate-200">
-                {remainingRequests} requests left
-              </span>
+              <div className="flex items-center gap-1.5">
+                <div className="flex bg-slate-100/80 p-0.5 rounded-full border border-slate-200">
+                  <button
+                    onClick={() => setAiProvider('groq')}
+                    className={`px-2.5 py-1 text-[11px] font-bold rounded-full transition-all flex items-center gap-1 ${
+                      aiProvider === 'groq'
+                        ? 'bg-white text-slate-900 shadow-sm'
+                        : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                    title="Groq — Fastest (Llama 3.3)"
+                  >
+                    <Zap className="w-3 h-3" /> Groq
+                  </button>
+                  <button
+                    onClick={() => setAiProvider('gemini')}
+                    className={`px-2.5 py-1 text-[11px] font-bold rounded-full transition-all flex items-center gap-1 ${
+                      aiProvider === 'gemini'
+                        ? 'bg-white text-slate-900 shadow-sm'
+                        : 'text-slate-500 hover:text-slate-700'
+                    }`}
+                    title="Gemini — Google AI"
+                  >
+                    💎 Gemini
+                  </button>
+                </div>
+                <span className="text-[11px] px-2 py-0.5 bg-slate-100 text-slate-600 rounded-full font-semibold border border-slate-200 shrink-0">
+                  {remainingRequests} left
+                </span>
+              </div>
             </div>
 
             {/* Chat Messages */}

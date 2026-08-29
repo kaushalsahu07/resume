@@ -18,7 +18,7 @@ changes once this is live.
 - **Auth:** **Supabase Auth** (email/password) — not custom JWT. FastAPI verifies the Supabase-issued JWT on protected routes rather than issuing its own.
 - **ORM:** SQLAlchemy (models mirror Supabase tables) — or query via `supabase-py` directly if that's simpler given Supabase Auth is already handling identity. Pick one and stay consistent; don't mix raw SQL and ORM calls in the same resource.
 - **Resume text extraction:** `pdfplumber` for PDF, `python-docx` for DOCX
-- **AI structuring:** Anthropic Claude API (`anthropic` Python SDK)
+- **AI structuring:** Groq and Gemini APIs (fallback mechanism)
 - **File upload handling:** `python-multipart`
 - **Deploy target:** Railway
 
@@ -162,9 +162,9 @@ Steps:
        doc = Document(file)
        return "\n".join(p.text for p in doc.paragraphs if p.text.strip())
    ```
-3. **Structure via Claude API:** send the raw text with a prompt requesting strict JSON matching
-   the `Portfolio` shape (headline, summary, education[], experience[], projects[], skills[],
-   achievements[], links[]). Use Claude's structured output / tool-use mode if available so the
+3. **Structure via AI API:** send the raw text with a prompt requesting strict JSON matching
+   the `ExtractedPortfolio` schema (headline, summary, education[], experience[], projects[], skills[],
+   achievements[], links[]). Uses Groq with a fallback to Gemini.
    response is guaranteed valid JSON rather than parsing free text.
 4. **Validate** the returned JSON against a Pydantic model. If validation fails, retry once with
    a stricter prompt; if it fails again, fall back to an empty-but-valid draft portfolio so the
@@ -175,7 +175,7 @@ Steps:
    (camelCase keys — see §6 note below). This single response is what the frontend uses to
    render the editor — there is no separate "confirm extraction" step. The moment
    `/resume/upload` resolves, the editor's form fields and live preview should already be
-   populated with everything Claude extracted (headline, summary, and every education/
+   populated with everything the AI extracted (headline, summary, and every education/
    experience/project/skill/achievement/link row), each carrying its real `id` so subsequent
    edits hit `PUT .../{item_id}` immediately rather than `POST` (which would create duplicates).
    The user's first action in the editor should be *correcting* pre-filled data, never filling
@@ -235,7 +235,7 @@ or a serialization layer — so the frontend never has to special-case field nam
 app/
   main.py                 # FastAPI app, CORS config, router includes
   core/
-    config.py              # env vars (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, ANTHROPIC_API_KEY, etc.)
+    config.py              # env vars (SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, GROQ_API_KEY, GEMINI_API_KEY, etc.)
     auth.py                 # Supabase JWT verification, get_current_user dependency
     supabase_client.py      # supabase-py client instances (anon + service role)
   models/
@@ -245,7 +245,7 @@ app/
     auth.py
   services/
     resume_parser.py        # pdfplumber/python-docx extraction functions
-    ai_structurer.py         # Claude API call + validation/retry logic
+    ai_structurer.py         # AI provider call + validation/retry logic (Groq -> Gemini)
   routers/
     auth.py
     portfolios.py
@@ -268,7 +268,8 @@ SUPABASE_URL=
 SUPABASE_ANON_KEY=
 SUPABASE_SERVICE_ROLE_KEY=      # server-side only, never sent to frontend
 SUPABASE_JWT_SECRET=            # for verifying incoming auth tokens
-ANTHROPIC_API_KEY=
+GROQ_API_KEY=
+GEMINI_API_KEY=
 CORS_ALLOWED_ORIGIN=             # Netlify frontend URL
 ```
 
@@ -307,7 +308,7 @@ app.add_middleware(
 > Postgres and Auth (verify Supabase-issued JWTs on protected routes, do not build custom
 > password auth). Implement the schema in backend.md §3 with RLS. Build a `/resume/upload`
 > endpoint that extracts text from PDF using pdfplumber and from DOCX using python-docx, sends
-> the text to the Anthropic API to return structured JSON matching the ExtractedPortfolio shape,
+> the text to the AI API to return structured JSON matching the ExtractedPortfolio shape,
 > validates it with Pydantic, and saves it as a new draft portfolio with child rows for
 > education/experience/projects/skills/achievements/links. Add full CRUD + reorder endpoints for
 > each section, a publish endpoint, and a public `/p/{slug}` endpoint using the Supabase service
