@@ -1,54 +1,95 @@
 import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
+import { Sparkles, ArrowRight } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
 
 export default function Login() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [error, setError] = useState('')
   const { login } = useAuth()
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    setError('')
     try {
       await login({ email, password })
       navigate('/dashboard')
-    } catch (err) {
-      alert('Login failed')
+    } catch (err: any) {
+      setError(err.message || 'Login failed. Please check your credentials.')
     }
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/30">
-      <div className="max-w-md w-full bg-background p-8 rounded-xl border border-border shadow-sm">
-        <h2 className="text-2xl font-display font-bold mb-6 text-center">Welcome Back</h2>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#edf4f9] px-4 py-12">
+      <Link to="/" className="flex items-center gap-2.5 mb-8 group">
+        <div className="w-9 h-9 rounded-xl bg-black text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform duration-200">
+          <Sparkles className="w-4 h-4 text-white fill-white" />
+        </div>
+        <span className="font-display font-bold text-2xl text-slate-900 tracking-tight">
+          PortfoliAI
+        </span>
+      </Link>
+
+      <div className="max-w-md w-full bg-white/80 backdrop-blur-md p-8 sm:p-10 rounded-3xl border border-slate-200/80 shadow-xl shadow-slate-200/50">
+        <div className="text-center mb-8">
+          <h2 className="text-2xl sm:text-3xl font-display font-extrabold text-slate-900 tracking-tight">
+            Welcome Back
+          </h2>
+          <p className="text-slate-500 text-sm mt-1.5">
+            Log in to manage your interactive portfolios
+          </p>
+        </div>
+
+        {error && (
+          <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-sm">
+            {error}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-4">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2.5 rounded-xl text-xs font-semibold">
+              {error}
+            </div>
+          )}
           <div>
-            <label className="block text-sm font-medium mb-1">Email</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email address</label>
             <input 
               type="email" 
               required
-              className="w-full p-2 border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="you@example.com"
+              className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl bg-white/90 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all text-sm"
               value={email}
               onChange={e => setEmail(e.target.value)}
             />
           </div>
           <div>
-            <label className="block text-sm font-medium mb-1">Password</label>
+            <label className="block text-sm font-semibold text-slate-700 mb-1.5">Password</label>
             <input 
               type="password" 
               required
-              className="w-full p-2 border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+              placeholder="••••••••"
+              className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl bg-white/90 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:border-slate-900 transition-all text-sm"
               value={password}
               onChange={e => setPassword(e.target.value)}
             />
           </div>
-          <button type="submit" className="w-full bg-primary text-primary-foreground p-2 rounded-md font-medium hover:opacity-90 transition-opacity">
-            Sign In
+          <button 
+            type="submit" 
+            className="w-full mt-2 bg-slate-950 hover:bg-slate-800 text-white py-3 rounded-xl font-semibold text-sm shadow-sm hover:shadow-md transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 group"
+          >
+            <span>Sign In</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </button>
         </form>
-        <p className="mt-4 text-center text-sm text-muted-foreground">
-          Don't have an account? <Link to="/register" className="text-foreground hover:underline">Register</Link>
+
+        <p className="mt-6 text-center text-sm text-slate-500">
+          Don't have an account?{' '}
+          <Link to="/register" className="font-semibold text-slate-900 hover:underline">
+            Register now
+          </Link>
         </p>
       </div>
     </div>

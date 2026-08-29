@@ -1,4 +1,6 @@
-from fastapi import FastAPI
+# from fastapi import FastAPI
+# pyrefly: ignore [missing-import, parse-error]
+import fastapi from FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.routers import auth, resume, portfolios, public

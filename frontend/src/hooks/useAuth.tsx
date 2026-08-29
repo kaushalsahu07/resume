@@ -38,15 +38,22 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       method: 'POST',
       body: JSON.stringify(data)
     })
+    if (!res.token) {
+      throw new Error('Invalid credentials')
+    }
     authStorage.setToken(res.token)
     setUser(res.user)
   }
 
   const register = async (data: any) => {
-    const res = await apiClient.request<AuthResponse>('/auth/register', {
+    const res = await apiClient.request<AuthResponse & { message?: string }>('/auth/register', {
       method: 'POST',
       body: JSON.stringify(data)
     })
+    // If Supabase email confirmation is enabled, backend returns {message} without token
+    if (!res.token) {
+      throw new Error(res.message || 'Registration successful! Please check your email to confirm your account.')
+    }
     authStorage.setToken(res.token)
     setUser(res.user)
   }

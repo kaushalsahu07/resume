@@ -2,8 +2,6 @@ import { authStorage } from './authStorage'
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000'
 
-// Mock data for development
-const mockUser = { id: '1', email: 'test@example.com', name: 'Test User' }
 let remainingAiRequests = 1000;
 
 

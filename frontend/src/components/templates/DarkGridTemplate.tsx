@@ -1,4 +1,3 @@
-import React from 'react'
 import type { Portfolio } from '../../types/portfolio'
 import { Send } from 'lucide-react'
 

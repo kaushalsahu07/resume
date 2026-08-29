@@ -1,4 +1,4 @@
-import { ComponentType } from 'react';
+import type { ComponentType } from 'react';
 import type { Portfolio } from '../../types/portfolio';
 
 // Eagerly load all templates in this directory ending with 'Template.tsx'
