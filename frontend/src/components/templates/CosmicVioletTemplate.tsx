@@ -635,41 +635,47 @@ export default function CosmicVioletTemplate({ portfolio }: { portfolio: Portfol
                       <div className={`lg:col-span-6 ${!isEven ? 'lg:col-start-1 lg:row-start-1' : ''}`}>
                         <div className="group relative rounded-2xl overflow-hidden bg-slate-950/90 border border-purple-500/30 shadow-xl p-2.5 sm:p-3.5 hover:border-purple-400/60 transition-all duration-300">
                           
-                          {/* Inner Viewport Mockup */}
-                          <div className="rounded-xl overflow-hidden bg-gradient-to-br from-slate-900 via-purple-950/70 to-slate-900 aspect-[16/10] sm:aspect-[16/9] min-h-[160px] sm:min-h-[200px] flex flex-col justify-between p-3.5 sm:p-5 relative border border-white/10">
-                            
-                            {/* Mockup Header Bar */}
-                            <div className="flex items-center justify-between">
-                              <div className="flex items-center gap-1.5">
-                                <span className="w-2 h-2 rounded-full bg-rose-500/80" />
-                                <span className="w-2 h-2 rounded-full bg-amber-500/80" />
-                                <span className="w-2 h-2 rounded-full bg-emerald-500/80" />
+                          {/* Thumbnail or Inner Viewport Mockup */}
+                          {proj.imageUrl ? (
+                            <div className="rounded-xl overflow-hidden aspect-square border border-white/10 bg-slate-900 w-full">
+                              <img src={proj.imageUrl} alt={proj.title} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
+                            </div>
+                          ) : (
+                            <div className="rounded-xl overflow-hidden bg-gradient-to-br from-slate-900 via-purple-950/70 to-slate-900 aspect-[16/10] sm:aspect-[16/9] min-h-[160px] sm:min-h-[200px] flex flex-col justify-between p-3.5 sm:p-5 relative border border-white/10">
+                              
+                              {/* Mockup Header Bar */}
+                              <div className="flex items-center justify-between">
+                                <div className="flex items-center gap-1.5">
+                                  <span className="w-2 h-2 rounded-full bg-rose-500/80" />
+                                  <span className="w-2 h-2 rounded-full bg-amber-500/80" />
+                                  <span className="w-2 h-2 rounded-full bg-emerald-500/80" />
+                                </div>
+                                <span className="text-[10px] font-mono text-purple-300/50">app.preview.live</span>
                               </div>
-                              <span className="text-[10px] font-mono text-purple-300/50">app.preview.live</span>
-                            </div>
 
-                            {/* Centered Graphic Icon & Info */}
-                            <div className="my-auto text-center space-y-2">
-                              <div className="inline-flex p-3 rounded-2xl bg-purple-900/50 border border-purple-500/40 text-purple-200 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-purple-700/50 transition-all duration-300">
-                                <Layers className="w-6 h-6 sm:w-8 sm:h-8" />
+                              {/* Centered Graphic Icon & Info */}
+                              <div className="my-auto text-center space-y-2">
+                                <div className="inline-flex p-3 rounded-2xl bg-purple-900/50 border border-purple-500/40 text-purple-200 group-hover:scale-105 group-hover:shadow-lg group-hover:shadow-purple-700/50 transition-all duration-300">
+                                  <Layers className="w-6 h-6 sm:w-8 sm:h-8" />
+                                </div>
+                                <h4 className="text-sm sm:text-base font-bold text-white tracking-tight">
+                                  {proj.title}
+                                </h4>
+                                <p className="text-[11px] sm:text-xs text-purple-300/70 font-mono truncate max-w-xs mx-auto">
+                                  {proj.techStack?.join(' • ') || 'Modern Full-Stack Solution'}
+                                </p>
                               </div>
-                              <h4 className="text-sm sm:text-base font-bold text-white tracking-tight">
-                                {proj.title}
-                              </h4>
-                              <p className="text-[11px] sm:text-xs text-purple-300/70 font-mono truncate max-w-xs mx-auto">
-                                {proj.techStack?.join(' • ') || 'Modern Full-Stack Solution'}
-                              </p>
-                            </div>
 
-                            {/* Bottom Status Bar */}
-                            <div className="flex items-center justify-between text-[10px] text-purple-200/50 pt-1.5 border-t border-white/5">
-                              <span>Interactive App</span>
-                              <span className="text-emerald-400 font-semibold flex items-center gap-1">
-                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                                Active
-                              </span>
+                              {/* Bottom Status Bar */}
+                              <div className="flex items-center justify-between text-[10px] text-purple-200/50 pt-1.5 border-t border-white/5">
+                                <span>Interactive App</span>
+                                <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                                  Active
+                                </span>
+                              </div>
                             </div>
-                          </div>
+                          )}
 
                         </div>
                       </div>

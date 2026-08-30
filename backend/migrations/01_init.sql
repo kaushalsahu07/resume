@@ -47,6 +47,7 @@ CREATE TABLE public.projects (
   description TEXT, 
   tech_stack TEXT[], 
   link TEXT, 
+  image_url TEXT,
   "order" INT DEFAULT 0
 );
 

@@ -49,24 +49,24 @@ export default function Demo() {
   const ActiveTemplateComponent = getTemplateById(selectedTemplateId).component
 
   return (
-    <div className="min-h-screen bg-[#0d0718] flex flex-col selection:bg-purple-600 selection:text-white">
+    <div className="min-h-screen bg-[#edf4f9] flex flex-col selection:bg-blue-600 selection:text-white">
       {/* Demo Sticky Bar */}
-      <header className="bg-[#110720]/90 backdrop-blur-md border-b border-white/10 px-3 sm:px-6 py-2.5 sm:py-3.5 sticky top-0 z-50 flex items-center justify-between gap-2 shadow-lg">
-        <Link to="/" className="flex items-center gap-1.5 text-purple-200 hover:text-white font-medium text-xs sm:text-sm transition-colors group flex-shrink-0">
+      <header className="bg-white/80 backdrop-blur-md border-b border-slate-200/80 px-3 sm:px-6 py-2.5 sm:py-3.5 sticky top-0 z-50 flex items-center justify-between gap-2 shadow-sm">
+        <Link to="/" className="flex items-center gap-1.5 text-slate-500 hover:text-slate-900 font-bold text-xs sm:text-sm transition-colors group flex-shrink-0">
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-0.5 transition-transform" />
           <span className="hidden md:inline">Back</span>
         </Link>
 
         {/* Template switcher pill */}
-        <div className="flex bg-white/5 p-1 rounded-full border border-white/10 overflow-x-auto max-w-[55vw] sm:max-w-none">
+        <div className="flex bg-slate-100/80 p-1 rounded-full border border-slate-200/80 overflow-x-auto max-w-[55vw] sm:max-w-none shadow-inner">
           {templates.map((t) => (
             <button 
               key={t.id}
               onClick={() => setSelectedTemplateId(t.id)}
-              className={`px-2.5 sm:px-4 py-1 rounded-full font-semibold text-[11px] sm:text-xs md:text-sm transition-all duration-200 whitespace-nowrap ${
+              className={`px-3 sm:px-5 py-1.5 rounded-full font-bold text-[11px] sm:text-xs md:text-sm transition-all duration-300 whitespace-nowrap ${
                 selectedTemplateId === t.id 
-                  ? 'bg-purple-600 text-white shadow-md shadow-purple-900/50' 
-                  : 'text-white/70 hover:text-white'
+                  ? 'bg-white text-blue-700 shadow-sm border border-slate-200' 
+                  : 'text-slate-500 hover:text-slate-900 hover:bg-slate-200/50'
               }`}
             >
               {t.name}
@@ -76,12 +76,12 @@ export default function Demo() {
 
         <Link
           to="/upload"
-          className="flex items-center gap-1 sm:gap-1.5 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-3 sm:px-4 py-1.5 rounded-full font-semibold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all hover:scale-[1.02] active:scale-[0.98] flex-shrink-0"
+          className="flex items-center gap-1 sm:gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-full font-bold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all hover:-translate-y-0.5 active:translate-y-0 flex-shrink-0"
         >
-          <Sparkles className="w-3.5 h-3.5 text-purple-200" />
+          <Sparkles className="w-4 h-4" />
           <span className="hidden sm:inline">Try with your resume</span>
           <span className="sm:hidden">Create</span>
-          <ArrowRight className="w-3.5 h-3.5 hidden md:inline" />
+          <ArrowRight className="w-4 h-4 hidden md:inline" />
         </Link>
       </header>
 

@@ -16,7 +16,7 @@ export interface Portfolio {
 
 export interface Education { id: string; institution: string; degree: string; field?: string; startDate?: string; endDate?: string; order: number; }
 export interface Experience { id: string; company: string; role: string; startDate?: string; endDate?: string; description?: string; order: number; }
-export interface Project { id: string; title: string; description?: string; techStack: string[]; link?: string; order: number; }
+export interface Project { id: string; title: string; description?: string; techStack: string[]; link?: string; imageUrl?: string; order: number; }
 export interface Skill { id: string; name: string; category?: string; }
 export interface Achievement { id: string; title: string; description?: string; date?: string; }
 export interface Link { id: string; label: string; url: string; }

@@ -2,8 +2,9 @@ import type { Portfolio } from '../../types/portfolio'
 
 export default function ClassicProfessionalTemplate({ portfolio }: { portfolio: Portfolio }) {
   return (
-    <div className="max-w-4xl mx-auto px-8 py-16 font-sans text-foreground bg-background">
-      <header className="border-b-2 border-primary pb-8 mb-8 text-center sm:text-left flex flex-col sm:flex-row justify-between items-end gap-6">
+    <div className="min-h-screen w-full bg-slate-50 text-slate-900 font-sans selection:bg-slate-200">
+      <div className="max-w-4xl mx-auto px-8 py-16">
+        <header className="border-b-2 border-slate-900 pb-8 mb-8 text-center sm:text-left flex flex-col sm:flex-row justify-between items-end gap-6">
         <div>
           <h1 className="text-4xl font-bold mb-2 uppercase tracking-tight">{portfolio.headline || 'Your Name'}</h1>
           {portfolio.summary && (
@@ -48,16 +49,25 @@ export default function ClassicProfessionalTemplate({ portfolio }: { portfolio: 
               <h2 className="text-xl font-bold uppercase tracking-wider border-b border-border pb-2 mb-6">Projects</h2>
               <div className="space-y-8">
                 {portfolio.projects.map(proj => (
-                  <div key={proj.id}>
-                    <h3 className="font-bold text-lg mb-1">
-                      {proj.link ? <a href={proj.link} target="_blank" rel="noreferrer" className="hover:underline">{proj.title}</a> : proj.title}
-                    </h3>
-                    {proj.description && <p className="text-sm text-muted-foreground leading-relaxed mb-3 whitespace-pre-wrap">{proj.description}</p>}
-                    {proj.techStack?.length > 0 && (
-                      <p className="text-xs font-medium text-muted-foreground">
-                        <span className="text-foreground">Tech:</span> {proj.techStack.join(', ')}
-                      </p>
+                  <div key={proj.id} className="flex flex-col sm:flex-row gap-4">
+                    {proj.imageUrl && (
+                      <div className="w-full sm:w-32 flex-shrink-0">
+                        <div className="aspect-square w-full rounded-md overflow-hidden bg-muted border border-border">
+                          <img src={proj.imageUrl} alt={proj.title} className="w-full h-full object-cover" />
+                        </div>
+                      </div>
                     )}
+                    <div className="flex-1">
+                      <h3 className="font-bold text-lg mb-1">
+                        {proj.link ? <a href={proj.link} target="_blank" rel="noreferrer" className="hover:underline">{proj.title}</a> : proj.title}
+                      </h3>
+                      {proj.description && <p className="text-sm text-muted-foreground leading-relaxed mb-3 whitespace-pre-wrap">{proj.description}</p>}
+                      {proj.techStack?.length > 0 && (
+                        <p className="text-xs font-medium text-muted-foreground">
+                          <span className="text-foreground">Tech:</span> {proj.techStack.join(', ')}
+                        </p>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -92,6 +102,7 @@ export default function ClassicProfessionalTemplate({ portfolio }: { portfolio: 
               </ul>
             </section>
           )}
+        </div>
         </div>
       </div>
     </div>

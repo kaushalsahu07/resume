@@ -9,6 +9,7 @@ import Upload from './pages/Upload'
 import Editor from './pages/Editor'
 import PublicPortfolio, { getSubdomainFromHostname } from './pages/PublicPortfolio'
 import Demo from './pages/Demo'
+import LivePreview from './pages/LivePreview'
 
 export default function App() {
   const subdomain = getSubdomainFromHostname()
@@ -22,6 +23,7 @@ export default function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/p/:slug" element={<PublicPortfolio />} />
           <Route path="/demo" element={<Demo />} />
+          <Route path="/live-preview" element={<LivePreview />} />
           
           {/* Protected Routes */}
           <Route element={<AuthedLayout />}>

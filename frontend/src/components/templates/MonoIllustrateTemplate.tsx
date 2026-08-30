@@ -647,25 +647,31 @@ export default function MonoIllustrateTemplate({ portfolio }: { portfolio: Portf
                     {/* Project Preview Mockup */}
                     <div className={`lg:col-span-6 ${!isEven ? 'lg:order-2' : ''}`}>
                       <div className="rounded-2xl bg-black border-2 border-zinc-800 p-3 shadow-xl">
-                        <div className="rounded-xl bg-zinc-900 aspect-[16/10] min-h-[170px] sm:min-h-[220px] p-4 flex flex-col justify-between border border-zinc-800">
-                          <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-1.5">
-                              <span className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
-                              <span className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
-                              <span className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
+                        {proj.imageUrl ? (
+                          <div className="rounded-xl overflow-hidden aspect-square border border-zinc-800 bg-zinc-900 w-full">
+                            <img src={proj.imageUrl} alt={proj.title} className="w-full h-full object-cover transition-transform duration-500 hover:scale-105" />
+                          </div>
+                        ) : (
+                          <div className="rounded-xl bg-zinc-900 aspect-[16/10] min-h-[170px] sm:min-h-[220px] p-4 flex flex-col justify-between border border-zinc-800">
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-1.5">
+                                <span className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
+                                <span className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
+                                <span className="w-2.5 h-2.5 rounded-full bg-zinc-700" />
+                              </div>
+                              <span className="text-[10px] font-mono text-zinc-500">project.{numString}.app</span>
                             </div>
-                            <span className="text-[10px] font-mono text-zinc-500">project.{numString}.app</span>
-                          </div>
 
-                          <div className="text-center space-y-2 my-auto">
-                            <Code2 className="w-8 h-8 text-white mx-auto" />
-                            <h4 className="font-extrabold text-base sm:text-lg text-white">{proj.title}</h4>
-                          </div>
+                            <div className="text-center space-y-2 my-auto">
+                              <Code2 className="w-8 h-8 text-white mx-auto" />
+                              <h4 className="font-extrabold text-base sm:text-lg text-white">{proj.title}</h4>
+                            </div>
 
-                          <div className="text-[10px] text-zinc-500 font-mono text-right">
-                            Interactive Build
+                            <div className="text-[10px] text-zinc-500 font-mono text-right">
+                              Interactive Build
+                            </div>
                           </div>
-                        </div>
+                        )}
                       </div>
                     </div>
 

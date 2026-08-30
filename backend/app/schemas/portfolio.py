@@ -35,6 +35,7 @@ class ProjectItem(BaseCamelModel):
     description: Optional[str] = None
     tech_stack: List[str] = []
     link: Optional[str] = None
+    image_url: Optional[str] = None
     order: int = 0
 
 class SkillItem(BaseCamelModel):

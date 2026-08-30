@@ -378,20 +378,26 @@ export default function DarkGridTemplate({ portfolio }: { portfolio: Portfolio }
                         )}
                       </div>
 
-                      {/* Mockup Canvas */}
-                      <div className="rounded-xl bg-[#06080e] border border-white/10 p-4 mb-4 aspect-[16/10] min-h-[150px] flex flex-col justify-between">
-                        <div className="flex items-center justify-between text-[10px] font-mono text-zinc-500">
-                          <span>node://{proj.title.toLowerCase().replace(/\s+/g, '-')}.app</span>
-                          <span className="text-emerald-400">● 200 OK</span>
+                      {/* Thumbnail or Mockup Canvas */}
+                      {proj.imageUrl ? (
+                        <div className="rounded-xl border border-cyan-500/30 overflow-hidden mb-4 aspect-square w-full bg-[#06080e]">
+                          <img src={proj.imageUrl} alt={proj.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                         </div>
-                        <div className="my-auto text-center space-y-1">
-                          <Layers className="w-6 h-6 text-cyan-400 mx-auto group-hover:scale-110 transition-transform" />
-                          <h4 className="font-bold text-base text-white tracking-tight">{proj.title}</h4>
+                      ) : (
+                        <div className="rounded-xl bg-[#06080e] border border-white/10 p-4 mb-4 aspect-[16/10] min-h-[150px] flex flex-col justify-between">
+                          <div className="flex items-center justify-between text-[10px] font-mono text-zinc-500">
+                            <span>node://{proj.title.toLowerCase().replace(/\s+/g, '-')}.app</span>
+                            <span className="text-emerald-400">● 200 OK</span>
+                          </div>
+                          <div className="my-auto text-center space-y-1">
+                            <Layers className="w-6 h-6 text-cyan-400 mx-auto group-hover:scale-110 transition-transform" />
+                            <h4 className="font-bold text-base text-white tracking-tight">{proj.title}</h4>
+                          </div>
+                          <div className="text-[10px] font-mono text-zinc-500 text-right">
+                            Prod Ready
+                          </div>
                         </div>
-                        <div className="text-[10px] font-mono text-zinc-500 text-right">
-                          Prod Ready
-                        </div>
-                      </div>
+                      )}
 
                       <p className="text-xs sm:text-sm text-zinc-300 leading-relaxed mb-4">
                         {proj.description || 'An advanced digital solution engineered with scalable architecture, responsive UI components, and high throughput backend APIs.'}

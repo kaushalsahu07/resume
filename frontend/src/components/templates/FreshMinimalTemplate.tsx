@@ -2,8 +2,9 @@ import type { Portfolio } from '../../types/portfolio'
 
 export default function FreshMinimalTemplate({ portfolio }: { portfolio: Portfolio }) {
   return (
-    <div className="max-w-3xl mx-auto px-6 py-20 font-sans text-foreground">
-      <header className="mb-20">
+    <div className="min-h-screen w-full bg-white text-slate-900 font-sans selection:bg-slate-200">
+      <div className="max-w-3xl mx-auto px-6 py-20">
+        <header className="mb-20">
         <h1 className="text-5xl font-display font-bold tracking-tight mb-4">{portfolio.headline || 'Your Name'}</h1>
         {portfolio.summary && (
           <p className="text-xl text-muted-foreground leading-relaxed max-w-2xl">
@@ -35,7 +36,12 @@ export default function FreshMinimalTemplate({ portfolio }: { portfolio: Portfol
           <h2 className="text-sm font-bold tracking-widest uppercase text-muted-foreground mb-8">Projects</h2>
           <div className="space-y-12">
             {portfolio.projects.map(proj => (
-              <div key={proj.id}>
+              <div key={proj.id} className="group">
+                {proj.imageUrl && (
+                  <div className="w-full sm:w-64 aspect-square mb-6 rounded-2xl overflow-hidden bg-muted border border-border">
+                    <img src={proj.imageUrl} alt={proj.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  </div>
+                )}
                 <h3 className="text-xl font-semibold mb-2">
                   {proj.link ? <a href={proj.link} target="_blank" rel="noreferrer" className="hover:underline">{proj.title}</a> : proj.title}
                 </h3>
@@ -77,6 +83,7 @@ export default function FreshMinimalTemplate({ portfolio }: { portfolio: Portfol
           </div>
         </section>
       )}
+      </div>
     </div>
   )
 }

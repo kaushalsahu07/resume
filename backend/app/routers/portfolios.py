@@ -42,6 +42,8 @@ def get_portfolios(client: Client = Depends(get_user_supabase)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+from app.schemas.portfolio import Portfolio
+
 @router.get("/{portfolio_id}", response_model=dict)
 def get_portfolio(portfolio_id: str, client: Client = Depends(get_user_supabase)):
     try:
@@ -53,7 +55,9 @@ def get_portfolio(portfolio_id: str, client: Client = Depends(get_user_supabase)
 
     if not res.data:
         raise HTTPException(status_code=404, detail="Portfolio not found")
-    return _format_portfolio(res.data)
+        
+    portfolio = Portfolio(**res.data)
+    return portfolio.model_dump(by_alias=True)
 
 
 @router.put("/{portfolio_id}", response_model=dict)
@@ -61,7 +65,8 @@ def update_portfolio(portfolio_id: str, data: dict, client: Client = Depends(get
     key_mapping = {
         "templateId": "template_id",
         "isPublished": "is_published",
-        "viewCount": "view_count"
+        "viewCount": "view_count",
+        "slug": "slug"
     }
     clean = {}
     for k, v in data.items():
@@ -77,6 +82,39 @@ def update_portfolio(portfolio_id: str, data: dict, client: Client = Depends(get
     if not res.data:
         raise HTTPException(status_code=404, detail="Portfolio not found")
     return _format_portfolio(res.data[0])
+
+
+from app.schemas.portfolio import ExtractedPortfolio
+
+@router.put("/{portfolio_id}/sync", response_model=dict)
+def sync_portfolio_full(portfolio_id: str, data: ExtractedPortfolio, client: Client = Depends(get_user_supabase)):
+    # 1. Update root fields if provided
+    clean = {}
+    if data.headline is not None:
+        clean["headline"] = data.headline
+    if data.summary is not None:
+        clean["summary"] = data.summary
+    
+    if clean:
+        client.table("portfolios").update(clean).eq("id", portfolio_id).execute()
+
+    # 2. Sync all children by deleting old and inserting new
+    # This ensures exact match with frontend state
+    # We must NOT use exclude_none=True because Supabase bulk insert requires all objects to have the exact same keys!
+    dumped = data.model_dump()
+    for section in ["education", "experience", "projects", "skills", "achievements", "links"]:
+        items = dumped.get(section, [])
+        client.table(section).delete().eq("portfolio_id", portfolio_id).execute()
+        if items:
+            for i, item in enumerate(items):
+                item["portfolio_id"] = portfolio_id
+                item.pop("id", None)  # let supabase generate real UUIDs
+                if section in ["education", "experience", "projects"]:
+                    item["order"] = i
+            client.table(section).insert(items).execute()
+
+    return get_portfolio(portfolio_id, client)
+
 
 
 @router.post("/{portfolio_id}/publish")
