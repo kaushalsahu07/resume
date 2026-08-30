@@ -8,7 +8,11 @@ import {
 import type { Portfolio } from '../types/portfolio'
 import { apiClient } from '../lib/apiClient'
 import { getPortfolioPublicUrl } from '../lib/portfolioUrl'
+<<<<<<< HEAD
 import { templates, getTemplateById } from '../components/templates'
+=======
+import { templates } from '../components/templates'
+>>>>>>> origin/master
 
 export default function Editor() {
   const { portfolioId } = useParams()

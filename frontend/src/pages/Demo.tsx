@@ -7,7 +7,11 @@ import type { Portfolio } from '../types/portfolio'
 const mockPortfolio: Portfolio = {
   id: 'demo-1',
   slug: 'demo',
+<<<<<<< HEAD
   templateId: 'cosmic-violet',
+=======
+  templateId: 'dark-grid',
+>>>>>>> origin/master
   headline: 'Jane Doe',
   summary: 'A passionate software engineer & UI/UX designer with 5+ years of experience building scalable web applications and intuitive user interfaces. Dedicated to clean code, accessible design, and delightful digital products.',
   isPublished: true,
@@ -44,7 +48,11 @@ const mockPortfolio: Portfolio = {
 }
 
 export default function Demo() {
+<<<<<<< HEAD
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('cosmic-violet')
+=======
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>('dark-grid')
+>>>>>>> origin/master
 
   const ActiveTemplateComponent = getTemplateById(selectedTemplateId).component
 

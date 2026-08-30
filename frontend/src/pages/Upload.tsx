@@ -10,7 +10,11 @@ type UploadState = 'idle' | 'uploading' | 'extracting' | 'structuring' | 'done' 
 const samplePortfolio: Portfolio = {
   id: 'sample-' + Date.now(),
   slug: 'sample-alex',
+<<<<<<< HEAD
   templateId: 'fresh-minimal',
+=======
+  templateId: 'dark-grid',
+>>>>>>> origin/master
   headline: 'Alex Morgan',
   summary: 'Senior Software Engineer with 6+ years of experience designing fault-tolerant cloud architectures and high-performance frontend interfaces. Passionate about developer tooling and AI workflows.',
   isPublished: false,
@@ -46,7 +50,11 @@ export default function Upload() {
   const [file, setFile] = useState<File | null>(null)
   const [state, setState] = useState<UploadState>('idle')
   const [errorMsg, setErrorMsg] = useState('')
+<<<<<<< HEAD
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('fresh-minimal')
+=======
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string>('dark-grid')
+>>>>>>> origin/master
   const [isDragging, setIsDragging] = useState(false)
   const [loadingStep, setLoadingStep] = useState(0)
 
