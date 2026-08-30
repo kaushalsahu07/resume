@@ -1,11 +1,7 @@
 export interface Portfolio {
   id: string;
   slug: string;
-<<<<<<< HEAD
-  templateId: 'fresh-minimal' | 'classic-professional' | 'dark-grid' | 'cosmic-violet' | 'mono-illustrate' | string;
-=======
   templateId: 'fresh-minimal' | 'classic-professional' | 'dark-grid' | 'cosmic-violet' | 'mono-illustrate' | 'emerald-editorial' | 'alex-editorial' | string;
->>>>>>> origin/master
   headline: string | null;
   summary: string | null;
   isPublished: boolean;

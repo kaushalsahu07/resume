@@ -82,11 +82,7 @@ export default function PublicPortfolio({ subdomainSlug }: { subdomainSlug?: str
     )
   }
 
-<<<<<<< HEAD
-  const activeTemplateId = portfolio.templateId || (portfolio as any).template_id || 'cosmic-violet'
-=======
   const activeTemplateId = portfolio.templateId || (portfolio as any).template_id || 'dark-grid'
->>>>>>> origin/master
   const TemplateComponent = getTemplateById(activeTemplateId)?.component
 
   return (

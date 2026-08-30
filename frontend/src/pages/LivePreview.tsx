@@ -33,11 +33,7 @@ export default function LivePreview() {
     )
   }
 
-<<<<<<< HEAD
-  const activeTemplateId = portfolio.templateId || (portfolio as any).template_id || 'cosmic-violet'
-=======
   const activeTemplateId = portfolio.templateId || (portfolio as any).template_id || 'dark-grid'
->>>>>>> origin/master
   const Template = getTemplateById(activeTemplateId).component
 
   return <Template portfolio={portfolio} />
