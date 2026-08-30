@@ -94,6 +94,10 @@ def sync_portfolio_full(portfolio_id: str, data: ExtractedPortfolio, client: Cli
         clean["headline"] = data.headline
     if data.summary is not None:
         clean["summary"] = data.summary
+    if data.slug is not None:
+        clean["slug"] = data.slug
+    if data.template_id is not None:
+        clean["template_id"] = data.template_id
     
     if clean:
         client.table("portfolios").update(clean).eq("id", portfolio_id).execute()

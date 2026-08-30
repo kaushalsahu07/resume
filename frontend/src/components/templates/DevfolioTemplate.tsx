@@ -99,14 +99,6 @@ export default function DevfolioTemplate({ portfolio }: { portfolio: Portfolio }
                   View My Work
                   <ArrowRight className="h-4 w-4" />
                 </a>
-
-                <a
-                  href={socialLinks[0]?.url || '#contact'}
-                  className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-300 bg-white/50 px-6 py-3 text-base font-semibold text-slate-700 transition hover:border-violet-300 hover:text-violet-700"
-                >
-                  <Download className="h-4 w-4" />
-                  Download Resume
-                </a>
               </div>
             </div>
 

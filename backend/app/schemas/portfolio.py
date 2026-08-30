@@ -59,6 +59,8 @@ class LinkItem(BaseCamelModel):
 class ExtractedPortfolio(BaseCamelModel):
     headline: Optional[str] = None
     summary: Optional[str] = None
+    slug: Optional[str] = None
+    template_id: Optional[str] = None
     education: List[EducationItem] = []
     experience: List[ExperienceItem] = []
     projects: List[ProjectItem] = []

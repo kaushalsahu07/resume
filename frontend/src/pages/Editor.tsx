@@ -266,7 +266,22 @@ export default function Editor() {
 
       // 3. Copy subdomain link
       const publicUrl = getPortfolioPublicUrl(portfolio.slug)
-      await navigator.clipboard.writeText(publicUrl)
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(publicUrl)
+        } else {
+          // Fallback for non-secure contexts (e.g. testing on local network)
+          const textArea = document.createElement("textarea")
+          textArea.value = publicUrl
+          document.body.appendChild(textArea)
+          textArea.select()
+          document.execCommand("copy")
+          document.body.removeChild(textArea)
+        }
+      } catch (err) {
+        console.error("Clipboard write failed", err)
+      }
+      
       setCopied(true)
       setTimeout(() => setCopied(false), 3000)
     } catch (err: any) {
