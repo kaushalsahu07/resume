@@ -23,7 +23,7 @@ You must return a JSON object with exactly two keys:
 Rules:
 - Only modify the fields the user asked about. Preserve everything else exactly.
 - Keep all existing IDs, slugs, and metadata unchanged unless explicitly asked.
-- For template changes, valid templateId values are: "fresh-minimal", "classic-professional", "dark-grid", "cosmic-violet", "mono-illustrate"
+- For template changes, valid templateId values are: "alex-editorial", "classic-professional", "cosmic-violet", "dark-grid", "devfolio", "emerald-editorial", "fresh-minimal", "mono-illustrate"
 - For skills, each skill needs: {"id": "skill-<timestamp>", "name": "SkillName"}
 - For text improvements, make them sound professional and impactful.
 - Output ONLY valid JSON — no markdown fences, no explanation outside the JSON.
@@ -153,6 +153,12 @@ def process_chat(message: str, current_portfolio: Dict[str, Any], preferred_prov
             error_msg = f"{provider_name} failed: {type(e).__name__}: {e}"
             print(f"[WARN] {error_msg}")
             errors.append(error_msg)
+            # TEMPORARY DEBUG: RETURN THE ERROR!
+            return {
+                "reply": f"DEBUG ERROR: {error_msg}",
+                "updatedPortfolio": current_portfolio,
+                "provider": provider_name.lower(),
+            }
 
         print(f"[Chat] Falling over to next provider...")
 
