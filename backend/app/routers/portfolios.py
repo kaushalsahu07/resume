@@ -33,9 +33,9 @@ def _format_portfolio(data: dict) -> dict:
 
 
 @router.get("", response_model=List[dict])
-def get_portfolios(client: Client = Depends(get_user_supabase)):
+def get_portfolios(client: Client = Depends(get_user_supabase), user_id: str = Depends(get_current_user)):
     try:
-        res = client.table("portfolios").select("*").order("created_at", desc=True).execute()
+        res = client.table("portfolios").select("*").eq("user_id", user_id).order("created_at", desc=True).execute()
         return [_format_portfolio(p) for p in (res.data or [])]
     except Exception as e:
         print("get_portfolios error:", e)
@@ -45,11 +45,11 @@ def get_portfolios(client: Client = Depends(get_user_supabase)):
 from app.schemas.portfolio import Portfolio
 
 @router.get("/{portfolio_id}", response_model=dict)
-def get_portfolio(portfolio_id: str, client: Client = Depends(get_user_supabase)):
+def get_portfolio(portfolio_id: str, client: Client = Depends(get_user_supabase), user_id: str = Depends(get_current_user)):
     try:
         res = client.table("portfolios").select(
             "*, education(*), experience(*), projects(*), skills(*), achievements(*), links(*)"
-        ).eq("id", portfolio_id).single().execute()
+        ).eq("id", portfolio_id).eq("user_id", user_id).single().execute()
     except Exception as e:
         raise HTTPException(status_code=404, detail="Portfolio not found")
 
@@ -87,7 +87,7 @@ def update_portfolio(portfolio_id: str, data: dict, client: Client = Depends(get
 from app.schemas.portfolio import ExtractedPortfolio
 
 @router.put("/{portfolio_id}/sync", response_model=dict)
-def sync_portfolio_full(portfolio_id: str, data: ExtractedPortfolio, client: Client = Depends(get_user_supabase)):
+def sync_portfolio_full(portfolio_id: str, data: ExtractedPortfolio, client: Client = Depends(get_user_supabase), user_id: str = Depends(get_current_user)):
     # 1. Update root fields if provided
     clean = {}
     if data.headline is not None:
@@ -117,7 +117,7 @@ def sync_portfolio_full(portfolio_id: str, data: ExtractedPortfolio, client: Cli
                     item["order"] = i
             client.table(section).insert(items).execute()
 
-    return get_portfolio(portfolio_id, client)
+    return get_portfolio(portfolio_id, client, user_id)
 
 
 

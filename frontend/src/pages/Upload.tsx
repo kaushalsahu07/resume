@@ -147,7 +147,12 @@ export default function Upload() {
       setLoadingStep(3)
 
       setTimeout(() => {
-        navigate(`/editor/${portfolio.id}`, { state: { templateId: selectedTemplateId, portfolio } })
+        navigate(`/editor/${portfolio.id}`, { 
+          state: { 
+            templateId: selectedTemplateId, 
+            portfolio: { ...portfolio, templateId: selectedTemplateId } 
+          } 
+        })
       }, 500)
     } catch (err: any) {
       clearInterval(interval)

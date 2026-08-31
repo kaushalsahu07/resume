@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+        <rect width="100%" height="100%" fill="#ffffff"/>
+        <pattern id="dots" width="10" height="10" patternUnits="userSpaceOnUse">
+            <circle cx="2" cy="2" r="1.5" fill="#000000" opacity="0.1"/>
+        </pattern>
+        <rect width="100%" height="100%" fill="url(#dots)"/>
+        
+        <!-- Neobrutalism Box -->
+        <rect x="45" y="45" width="310" height="210" fill="#000000"/>
+        <rect x="40" y="40" width="310" height="210" fill="#ffffff" stroke="#000000" stroke-width="4"/>
+        
+        <!-- Large Type -->
+        <text x="60" y="90" font-family="sans-serif" font-size="36" font-weight="900" fill="#000000">MONO.</text>
+        
+        <!-- Graphic element -->
+        <path d="M 230 60 L 320 60 L 320 150 Z" fill="#000000"/>
+        
+        <!-- Content lines -->
+        <rect x="60" y="120" width="140" height="10" fill="#000000"/>
+        <rect x="60" y="140" width="120" height="10" fill="#000000"/>
+        
+        <!-- Pilled Tags -->
+        <rect x="60" y="180" width="70" height="30" rx="15" fill="#ffffff" stroke="#000000" stroke-width="3"/>
+        <rect x="140" y="180" width="90" height="30" rx="15" fill="#000000" stroke="#000000" stroke-width="3"/>
+    </svg>

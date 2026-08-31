@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+        <rect width="100%" height="100%" fill="#0a0a0a"/>
+        <pattern id="dark-grid-pattern" width="20" height="20" patternUnits="userSpaceOnUse">
+            <path d="M 20 0 L 0 0 0 20" fill="none" stroke="#262626" stroke-width="1"/>
+        </pattern>
+        <rect width="100%" height="100%" fill="url(#dark-grid-pattern)"/>
+        
+        <text x="40" y="60" font-family="monospace" font-size="20" font-weight="bold" fill="#10b981">&gt; Hello World_</text>
+        <rect x="40" y="80" width="250" height="6" fill="#737373"/>
+        <rect x="40" y="100" width="220" height="6" fill="#737373"/>
+        <rect x="40" y="120" width="240" height="6" fill="#737373"/>
+        
+        <!-- Terminal Box -->
+        <rect x="40" y="160" width="320" height="100" rx="6" fill="#171717" stroke="#262626" stroke-width="2"/>
+        <circle cx="55" cy="175" r="4" fill="#ef4444"/>
+        <circle cx="70" cy="175" r="4" fill="#eab308"/>
+        <circle cx="85" cy="175" r="4" fill="#22c55e"/>
+        <rect x="55" y="195" width="200" height="4" fill="#a3e635"/>
+        <rect x="55" y="210" width="180" height="4" fill="#a3e635"/>
+        <rect x="55" y="225" width="220" height="4" fill="#a3e635"/>
+    </svg>

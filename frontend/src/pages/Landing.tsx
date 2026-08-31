@@ -1,15 +1,19 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { 
-  FileUp, Sparkles, LayoutTemplate, ArrowRight, Eye, LogOut, 
-  CheckCircle2, Zap, Shield, Globe, ChevronDown, 
+import {
+  FileUp, Sparkles, LayoutTemplate, ArrowRight, Eye, LogOut,
+  CheckCircle2, Zap, Shield, Globe, ChevronDown,
   Smartphone, Palette, Wand2
 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
+import freshSvg from '../components/templates/fresh-minimal.svg'
+import darkSvg from '../components/templates/dark-grid.svg'
+import classicSvg from '../components/templates/classic-professional.svg'
+import alexSvg from '../components/templates/alex-editorial.svg'
 
 export default function Landing() {
   const { user, logout } = useAuth()
-  const [activePreviewTemplate, setActivePreviewTemplate] = useState<'fresh' | 'dark' | 'classic'>('fresh')
+  const [activePreviewTemplate, setActivePreviewTemplate] = useState<'fresh' | 'dark' | 'classic' | 'alex'>('fresh')
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
   const toggleFaq = (index: number) => {
@@ -181,72 +185,24 @@ export default function Landing() {
                 >
                   Classic Pro
                 </button>
+                <button
+                  onClick={() => setActivePreviewTemplate('alex')}
+                  className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${activePreviewTemplate === 'alex' ? 'bg-white text-slate-950 shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
+                >
+                  Alex Editorial
+                </button>
               </div>
             </div>
 
             {/* Showcase Viewport */}
-            <div className={`rounded-2xl p-6 sm:p-8 text-left transition-all duration-300 min-h-[280px] sm:min-h-[320px] flex flex-col justify-between ${activePreviewTemplate === 'dark' ? 'bg-[#0a0a0a] text-white' : 'bg-white text-slate-900 border border-slate-100'}`}>
-              {activePreviewTemplate === 'fresh' && (
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="px-2.5 py-0.5 rounded-full bg-slate-100 text-slate-600 text-xs font-semibold">Senior Software Engineer</span>
-                    <span className="text-xs text-emerald-600 font-medium">● Available for roles</span>
-                  </div>
-                  <h3 className="font-display text-2xl sm:text-3xl font-extrabold text-slate-950 mb-2">Alex Morgan</h3>
-                  <p className="text-slate-500 text-sm max-w-xl leading-relaxed mb-6">
-                    Full-stack builder specialized in React, Node.js, and Distributed Systems. Built scalable services serving 2M+ monthly active users.
-                  </p>
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {['React', 'TypeScript', 'Next.js', 'PostgreSQL', 'TailwindCSS', 'AWS'].map((tag) => (
-                      <span key={tag} className="px-3 py-1 rounded-md bg-slate-50 border border-slate-200/80 text-slate-700 text-xs font-medium">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {activePreviewTemplate === 'dark' && (
-                <div>
-                  <div className="flex items-center gap-2 mb-3">
-                    <span className="px-2.5 py-0.5 rounded-full bg-blue-500/20 text-blue-400 border border-blue-500/30 text-xs font-semibold">Full Stack Engineer</span>
-                  </div>
-                  <h3 className="font-display text-2xl sm:text-3xl font-extrabold text-white mb-2">
-                    Crafting <span className="text-blue-500">Seamless</span> Digital Products.
-                  </h3>
-                  <p className="text-slate-400 text-sm max-w-xl leading-relaxed mb-6">
-                    Turning complex problems into clean, high-performance web applications with modern design aesthetics.
-                  </p>
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {['AI Integrations', 'Vite', 'React 19', 'GraphQL', 'Docker'].map((tag) => (
-                      <span key={tag} className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-slate-300 text-xs font-medium">
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {activePreviewTemplate === 'classic' && (
-                <div>
-                  <div className="border-b-2 border-slate-900 pb-3 mb-4 flex justify-between items-end">
-                    <div>
-                      <h3 className="font-display text-2xl sm:text-3xl font-bold uppercase tracking-tight text-slate-950">ALEX MORGAN</h3>
-                      <p className="text-slate-600 text-xs font-semibold uppercase tracking-wider">Lead Product Engineer</p>
-                    </div>
-                    <span className="text-xs text-slate-500 font-medium">San Francisco, CA</span>
-                  </div>
-                  <p className="text-slate-600 text-sm leading-relaxed mb-6">
-                    Track record of delivering enterprise-grade cloud platforms and leading engineering teams to exceed core velocity milestones.
-                  </p>
-                  <div className="space-y-2">
-                    <div className="text-xs font-bold uppercase tracking-wider text-slate-400">Recent Highlights</div>
-                    <div className="text-sm font-medium text-slate-800">Lead Architect • TechCorp (2022 - Present)</div>
-                  </div>
-                </div>
-              )}
-
-              <div className="pt-4 border-t border-slate-200/40 flex items-center justify-between">
+            <div className="rounded-2xl overflow-hidden transition-all duration-300 min-h-[280px] sm:min-h-[320px] flex flex-col justify-between bg-slate-100 border border-slate-200 relative">
+              <div className="flex-1 w-full h-full relative min-h-[280px]">
+                {activePreviewTemplate === 'fresh' && <img src={freshSvg} alt="Fresh Minimal" className="absolute inset-0 w-full h-full object-cover" />}
+                {activePreviewTemplate === 'dark' && <img src={darkSvg} alt="Dark Grid" className="absolute inset-0 w-full h-full object-cover" />}
+                {activePreviewTemplate === 'classic' && <img src={classicSvg} alt="Classic Pro" className="absolute inset-0 w-full h-full object-cover" />}
+                {activePreviewTemplate === 'alex' && <img src={alexSvg} alt="Alex Editorial" className="absolute inset-0 w-full h-full object-cover" />}
+              </div>
+              <div className="pt-4 px-6 pb-6 border-t border-slate-200/40 flex items-center justify-between bg-white/90 backdrop-blur z-10">
                 <span className="text-xs font-medium text-slate-400">Interactive live template sample</span>
                 <Link
                   to="/demo"
@@ -407,7 +363,7 @@ export default function Landing() {
 
           <div className="space-y-3">
             {faqs.map((faq, idx) => (
-              <div 
+              <div
                 key={idx}
                 className="bg-white/70 border border-slate-200/80 rounded-2xl overflow-hidden transition-all duration-200"
               >

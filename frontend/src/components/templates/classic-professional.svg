@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 300">
+        <rect width="100%" height="100%" fill="#ffffff"/>
+        <!-- Top Bar -->
+        <rect width="100%" height="70" fill="#1e3a8a"/>
+        <circle cx="60" cy="35" r="20" fill="#ffffff" opacity="0.9"/>
+        <rect x="100" y="25" width="150" height="12" fill="#ffffff"/>
+        <rect x="100" y="45" width="100" height="6" fill="#bfdbfe"/>
+        <!-- Content -->
+        <rect x="30" y="90" width="100" height="8" fill="#1e3a8a"/>
+        <rect x="30" y="110" width="340" height="5" fill="#64748b"/>
+        <rect x="30" y="125" width="320" height="5" fill="#64748b"/>
+        <rect x="30" y="140" width="330" height="5" fill="#64748b"/>
+        
+        <rect x="30" y="170" width="100" height="8" fill="#1e3a8a"/>
+        <rect x="30" y="190" width="340" height="5" fill="#64748b"/>
+        <rect x="30" y="205" width="320" height="5" fill="#64748b"/>
+        
+        <rect x="30" y="235" width="100" height="8" fill="#1e3a8a"/>
+        <rect x="30" y="255" width="50" height="15" rx="7.5" fill="#e2e8f0"/>
+        <rect x="90" y="255" width="60" height="15" rx="7.5" fill="#e2e8f0"/>
+        <rect x="160" y="255" width="40" height="15" rx="7.5" fill="#e2e8f0"/>
+    </svg>
