@@ -10,7 +10,7 @@ app = FastAPI(title="Resume-to-Portfolio API")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[settings.CORS_ALLOWED_ORIGIN, "http://localhost:5173", "http://localhost:3000"],
-    allow_origin_regex=r"^https?://([a-zA-Z0-9-]+\.)*(localhost|portfolio\.me)(:\d+)?$",
+    allow_origin_regex=r"^https?://([a-zA-Z0-9-]+\.)*(localhost|portfolio\.me|vercel\.app)(:\d+)?$",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
