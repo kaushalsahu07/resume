@@ -42,55 +42,55 @@ export default function Landing() {
   return (
     <div className="min-h-screen flex flex-col bg-[#edf4f9] text-slate-900 selection:bg-slate-900 selection:text-white">
       {/* Navbar */}
-      <header className="w-full px-6 sm:px-10 py-5 flex items-center justify-between sticky top-0 z-50 backdrop-blur-md bg-[#edf4f9]/85 border-b border-slate-200/50 transition-all duration-300">
-        <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="w-8 h-8 rounded-lg bg-black text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform duration-200">
-            <Sparkles className="w-4 h-4 text-white fill-white" />
+      <header className="w-full px-4 sm:px-10 py-4 sm:py-5 flex items-center justify-between sticky top-0 z-50 backdrop-blur-md bg-[#edf4f9]/85 border-b border-slate-200/50 transition-all duration-300 overflow-x-hidden">
+        <Link to="/" className="flex items-center gap-2 sm:gap-2.5 group shrink-0">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-black text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform duration-200">
+            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-white fill-white" />
           </div>
-          <span className="font-display font-bold text-xl sm:text-2xl text-slate-900 tracking-tight">
+          <span className="font-display font-bold text-lg sm:text-2xl text-slate-900 tracking-tight">
             PortfoliAI
           </span>
         </Link>
 
-        <nav className="flex items-center gap-4 sm:gap-6">
+        <nav className="flex items-center gap-2 sm:gap-6 shrink-0">
           <Link
             to="/demo"
-            className="flex items-center gap-1.5 text-sm font-medium text-slate-600 hover:text-slate-950 transition-colors group px-2 py-1 rounded-md hover:bg-slate-200/40"
+            className="hidden sm:flex items-center gap-1.5 text-xs sm:text-sm font-medium text-slate-600 hover:text-slate-950 transition-colors group px-2 py-1 rounded-md hover:bg-slate-200/40"
           >
-            <Eye className="w-4 h-4 text-slate-500 group-hover:text-slate-950 transition-colors" />
+            <Eye className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-500 group-hover:text-slate-950 transition-colors" />
             <span>Demo</span>
           </Link>
 
           {user ? (
-            <div className="flex items-center gap-3">
-              <span className="text-sm font-medium text-slate-600 hidden sm:inline">
+            <div className="flex items-center gap-2 sm:gap-3">
+              <span className="text-xs sm:text-sm font-medium text-slate-600 hidden sm:inline">
                 Hi, {user.name}
               </span>
               <Link
                 to="/dashboard"
-                className="text-sm font-semibold bg-slate-950 text-white px-4 py-2 rounded-full hover:bg-slate-800 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xs"
+                className="text-xs sm:text-sm font-semibold bg-slate-950 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-full hover:bg-slate-800 transition-all hover:scale-[1.02] active:scale-[0.98] shadow-xs whitespace-nowrap"
               >
                 Dashboard
               </Link>
               <button
                 onClick={logout}
-                className="text-sm font-medium text-slate-600 hover:text-red-600 p-2 rounded-full hover:bg-slate-200/50 transition-colors"
+                className="text-xs sm:text-sm font-medium text-slate-600 hover:text-red-600 p-1.5 sm:p-2 rounded-full hover:bg-slate-200/50 transition-colors"
                 title="Logout"
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
               </button>
             </div>
           ) : (
-            <div className="flex items-center gap-3 sm:gap-4">
+            <div className="flex items-center gap-1.5 sm:gap-4">
               <Link
                 to="/login"
-                className="text-sm font-semibold text-slate-700 hover:text-slate-950 px-3 py-1.5 rounded-lg hover:bg-slate-200/40 transition-all"
+                className="text-xs sm:text-sm font-semibold text-slate-700 hover:text-slate-950 px-2 sm:px-3 py-1.5 rounded-lg hover:bg-slate-200/40 transition-all whitespace-nowrap"
               >
                 Log in
               </Link>
               <Link
                 to="/register"
-                className="text-sm font-semibold bg-slate-950 text-white px-5 py-2.5 rounded-full hover:bg-slate-800 transition-all duration-200 hover:scale-[1.03] hover:shadow-md active:scale-[0.98]"
+                className="text-xs sm:text-sm font-semibold bg-slate-950 text-white px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-full hover:bg-slate-800 transition-all duration-200 hover:scale-[1.03] hover:shadow-md active:scale-[0.98] whitespace-nowrap"
               >
                 Get Started
               </Link>
