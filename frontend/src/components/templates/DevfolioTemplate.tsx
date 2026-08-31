@@ -1,4 +1,4 @@
-import { ArrowRight, Download, Mail, Sparkles, Star } from 'lucide-react'
+import { ArrowRight, Mail, Sparkles, Star } from 'lucide-react'
 import type { Portfolio } from '../../types/portfolio'
 
 const getInitials = (name: string) => {
