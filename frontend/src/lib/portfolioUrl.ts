@@ -9,8 +9,19 @@ export function getPortfolioPublicUrl(slug: string): string {
     return `http://${slug}.localhost${port}`
   }
 
-  // Production domain
+  // Check if we are on a PaaS domain that doesn't support wildcard subdomains
+  const isPaas = hostname.endsWith('.onrender.com') || 
+                 hostname.endsWith('.vercel.app') || 
+                 hostname.endsWith('.netlify.app') ||
+                 hostname.endsWith('.pages.dev')
+
+  if (isPaas) {
+    // For Vercel/Render, we must use the path-based routing
+    return `${protocol}//${hostname}${port}/p/${slug}`
+  }
+
+  // Production custom domain (e.g. portfolio.me)
   const rootDomain = hostname.replace(/^(www\.|app\.)/, '')
   const baseDomain = rootDomain || 'portfolio.me'
-  return `${protocol}//${slug}.${baseDomain}`
+  return `${protocol}//${slug}.${baseDomain}${port}`
 }
