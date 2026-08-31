@@ -12,7 +12,13 @@ export function getSubdomainFromHostname(hostname = window.location.hostname): s
     if (isLocalhost && parts.length >= 2 && parts[0] !== 'localhost') {
       return parts[0].toLowerCase()
     }
-    if (!isLocalhost && parts.length >= 3) {
+    
+    const isPaas = hostname.endsWith('.onrender.com') || 
+                   hostname.endsWith('.vercel.app') || 
+                   hostname.endsWith('.netlify.app') ||
+                   hostname.endsWith('.pages.dev')
+
+    if (!isLocalhost && parts.length >= 3 && !isPaas) {
       const sub = parts[0].toLowerCase()
       if (!['www', 'app', 'api', 'admin', 'portfolio'].includes(sub)) {
         return sub
