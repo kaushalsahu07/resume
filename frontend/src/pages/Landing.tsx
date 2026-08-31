@@ -166,7 +166,7 @@ export default function Landing() {
               </div>
 
               {/* Template Switcher Tabs */}
-              <div className="flex bg-slate-100/90 p-1 rounded-xl border border-slate-200/80">
+              <div className="flex flex-wrap justify-center sm:flex-nowrap gap-1 sm:gap-0 bg-slate-100/90 p-1 rounded-xl border border-slate-200/80">
                 <button
                   onClick={() => setActivePreviewTemplate('fresh')}
                   className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${activePreviewTemplate === 'fresh' ? 'bg-white text-slate-950 shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
