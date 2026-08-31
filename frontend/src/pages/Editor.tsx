@@ -1034,7 +1034,7 @@ export default function Editor() {
           }`}
       >
         {/* Preview Top Toolbar */}
-        <div className="p-3 sm:px-6 flex justify-between items-center shrink-0 bg-white/60 backdrop-blur-md border-b border-slate-200/70 z-30">
+        <div className="p-3 sm:px-6 flex flex-wrap sm:flex-nowrap justify-center sm:justify-between items-center gap-3 sm:gap-0 shrink-0 bg-white/60 backdrop-blur-md border-b border-slate-200/70 z-30">
           {/* Viewport switcher */}
           <div className="flex items-center gap-1 bg-white/80 p-1 rounded-full border border-slate-200 shadow-2xs">
             <button
@@ -1056,11 +1056,11 @@ export default function Editor() {
           </div>
 
           {/* Custom Domain Slug input */}
-          <div className="flex items-center gap-1 bg-white/90 border border-slate-200 rounded-full px-3 py-1 text-xs shadow-2xs">
-            <span className="text-slate-400 font-medium">https://</span>
+          <div className="flex items-center gap-1 bg-white/90 border border-slate-200 rounded-full px-2 sm:px-3 py-1 text-[11px] sm:text-xs shadow-2xs">
+            <span className="text-slate-400 font-medium hidden sm:inline">https://</span>
             <input
               type="text"
-              className="bg-transparent text-slate-900 font-bold outline-none w-[90px] sm:w-[130px] text-xs"
+              className="bg-transparent text-slate-900 font-bold outline-none w-[70px] sm:w-[130px] text-[11px] sm:text-xs text-right sm:text-left"
               value={portfolio.slug || ''}
               onChange={e => handleUpdate({ slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') })}
               placeholder="yourname"
@@ -1072,17 +1072,17 @@ export default function Editor() {
           <div className="flex items-center gap-2">
             <button
               onClick={handlePublish}
-              className="flex items-center gap-1.5 bg-slate-950 hover:bg-slate-800 text-white px-4 py-1.5 rounded-full text-xs font-bold shadow-sm transition-all hover:scale-105 active:scale-95"
+              className="flex items-center gap-1.5 bg-slate-950 hover:bg-slate-800 text-white px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold shadow-sm transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Send className="w-3.5 h-3.5" />}
-              <span>{copied ? 'Copied Link!' : portfolio.isPublished ? 'Update & Copy' : 'Publish Live'}</span>
+              <span>{copied ? 'Copied!' : portfolio.isPublished ? 'Update & Copy' : 'Publish Live'}</span>
             </button>
             {portfolio.isPublished && (
               <a
                 href={getPortfolioPublicUrl(portfolio.slug)}
                 target="_blank"
                 rel="noreferrer"
-                className="p-1.5 rounded-full bg-white border border-slate-200 text-slate-700 hover:text-black hover:bg-slate-50 transition-colors shadow-2xs"
+                className="p-1.5 rounded-full bg-white border border-slate-200 text-slate-700 hover:text-black hover:bg-slate-50 transition-colors shadow-2xs shrink-0"
                 title={`Open live portfolio (${getPortfolioPublicUrl(portfolio.slug)})`}
               >
                 <ExternalLink className="w-3.5 h-3.5" />
