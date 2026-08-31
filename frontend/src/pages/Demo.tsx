@@ -4,7 +4,7 @@ import { Sparkles, ArrowLeft, ArrowRight } from 'lucide-react'
 import { templates, getTemplateById } from '../components/templates'
 import type { Portfolio } from '../types/portfolio'
 
-const mockPortfolio: Portfolio = {
+export const mockPortfolio: Portfolio = {
   id: 'demo-1',
   slug: 'demo',
   templateId: 'dark-grid',

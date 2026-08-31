@@ -6,14 +6,19 @@ import {
   Smartphone, Palette, Wand2
 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
-import freshSvg from '../components/templates/fresh-minimal.svg'
-import darkSvg from '../components/templates/dark-grid.svg'
-import classicSvg from '../components/templates/classic-professional.svg'
-import alexSvg from '../components/templates/alex-editorial.svg'
+import { getTemplateById } from '../components/templates'
+import { mockPortfolio } from './Demo'
+
+const PREVIEW_TEMPLATES = [
+  { id: 'fresh-minimal', name: 'Fresh Minimal' },
+  { id: 'dark-grid', name: 'Dark Grid' },
+  { id: 'classic-professional', name: 'Classic Pro' },
+  { id: 'alex-editorial', name: 'Alex Editorial' },
+]
 
 export default function Landing() {
   const { user, logout } = useAuth()
-  const [activePreviewTemplate, setActivePreviewTemplate] = useState<'fresh' | 'dark' | 'classic' | 'alex'>('fresh')
+  const [activePreviewTemplate, setActivePreviewTemplate] = useState<string>('fresh-minimal')
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
   const toggleFaq = (index: number) => {
@@ -167,40 +172,39 @@ export default function Landing() {
 
               {/* Template Switcher Tabs */}
               <div className="flex flex-wrap justify-center sm:flex-nowrap gap-1 sm:gap-0 bg-slate-100/90 p-1 rounded-xl border border-slate-200/80">
-                <button
-                  onClick={() => setActivePreviewTemplate('fresh')}
-                  className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${activePreviewTemplate === 'fresh' ? 'bg-white text-slate-950 shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
-                >
-                  Fresh Minimal
-                </button>
-                <button
-                  onClick={() => setActivePreviewTemplate('dark')}
-                  className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${activePreviewTemplate === 'dark' ? 'bg-slate-950 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
-                >
-                  Dark Grid
-                </button>
-                <button
-                  onClick={() => setActivePreviewTemplate('classic')}
-                  className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${activePreviewTemplate === 'classic' ? 'bg-white text-slate-950 shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
-                >
-                  Classic Pro
-                </button>
-                <button
-                  onClick={() => setActivePreviewTemplate('alex')}
-                  className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${activePreviewTemplate === 'alex' ? 'bg-white text-slate-950 shadow-xs' : 'text-slate-600 hover:text-slate-900'}`}
-                >
-                  Alex Editorial
-                </button>
+                {PREVIEW_TEMPLATES.map((t) => (
+                  <button
+                    key={t.id}
+                    type="button"
+                    onClick={() => setActivePreviewTemplate(t.id)}
+                    className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all ${
+                      activePreviewTemplate === t.id
+                        ? 'bg-slate-950 text-white shadow-xs'
+                        : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/50'
+                    }`}
+                  >
+                    {t.name}
+                  </button>
+                ))}
               </div>
             </div>
 
             {/* Showcase Viewport */}
             <div className="rounded-2xl overflow-hidden transition-all duration-300 min-h-[280px] sm:min-h-[320px] flex flex-col justify-between bg-slate-100 border border-slate-200 relative">
-              <div className="flex-1 w-full h-full relative min-h-[280px]">
-                {activePreviewTemplate === 'fresh' && <img src={freshSvg} alt="Fresh Minimal" className="absolute inset-0 w-full h-full object-cover" />}
-                {activePreviewTemplate === 'dark' && <img src={darkSvg} alt="Dark Grid" className="absolute inset-0 w-full h-full object-cover" />}
-                {activePreviewTemplate === 'classic' && <img src={classicSvg} alt="Classic Pro" className="absolute inset-0 w-full h-full object-cover" />}
-                {activePreviewTemplate === 'alex' && <img src={alexSvg} alt="Alex Editorial" className="absolute inset-0 w-full h-full object-cover" />}
+              <div className="flex-1 w-full h-full relative min-h-[300px] sm:min-h-[380px] bg-slate-50/50 overflow-hidden">
+                {/* Centered Scaled Wrapper */}
+                <div className="absolute top-4 left-1/2 transition-all duration-500 z-0" style={{ transform: 'translateX(-50%)' }}>
+                  <div className="w-[1200px] origin-top scale-[0.28] sm:scale-[0.45] md:scale-[0.55] lg:scale-[0.65] pointer-events-none transition-all duration-500">
+                    <div className="bg-white rounded-t-2xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.1)] border border-slate-200/60 overflow-hidden min-h-[1000px]">
+                      {(() => {
+                        const TemplateComponent = getTemplateById(activePreviewTemplate).component
+                        return <TemplateComponent key={activePreviewTemplate} portfolio={{ ...mockPortfolio, templateId: activePreviewTemplate }} />
+                      })()}
+                    </div>
+                  </div>
+                </div>
+                {/* Smooth Fade Out */}
+                <div className="absolute bottom-0 left-0 w-full h-32 bg-gradient-to-t from-slate-100 to-transparent pointer-events-none z-10" />
               </div>
               <div className="pt-4 px-6 pb-6 border-t border-slate-200/40 flex items-center justify-between bg-white/90 backdrop-blur z-10">
                 <span className="text-xs font-medium text-slate-400">Interactive live template sample</span>

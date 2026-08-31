@@ -42,6 +42,29 @@ export const templates: TemplateDefinition[] = Object.entries(templateModules).m
   }
 );
 
-export const getTemplateById = (id: string): TemplateDefinition => {
-  return templates.find(t => t.id === id) || templates[0];
+export const getTemplateById = (id?: string): TemplateDefinition => {
+  if (!id) return templates[0];
+  const normalizedId = id.toLowerCase().trim();
+
+  // 1. Exact ID match (e.g. 'fresh-minimal', 'dark-grid')
+  const exactMatch = templates.find(t => t.id.toLowerCase() === normalizedId);
+  if (exactMatch) return exactMatch;
+
+  // 2. Exact Name match (e.g. 'Fresh Minimal', 'Dark Grid')
+  const nameMatch = templates.find(t => t.name.toLowerCase() === normalizedId);
+  if (nameMatch) return nameMatch;
+
+  // 3. Normalized / alias match (e.g. 'fresh', 'dark', 'classic', 'alex', 'dark_grid')
+  const cleanTarget = normalizedId.replace(/[^a-z0-9]/g, '');
+  const fuzzyMatch = templates.find(t => {
+    const cleanTId = t.id.replace(/[^a-z0-9]/g, '');
+    const cleanTName = t.name.toLowerCase().replace(/[^a-z0-9]/g, '');
+    return cleanTId === cleanTarget ||
+           cleanTId.startsWith(cleanTarget) ||
+           cleanTarget.startsWith(cleanTId) ||
+           cleanTName.startsWith(cleanTarget);
+  });
+  if (fuzzyMatch) return fuzzyMatch;
+
+  return templates[0];
 };
