@@ -8,11 +8,3 @@ class AuthRegister(BaseModel):
 class AuthLogin(BaseModel):
     email: EmailStr
     password: str
-
-class AuthResponse(BaseModel):
-    token: str
-    user: dict
-
-class UserProfile(BaseModel):
-    id: str
-    name: str

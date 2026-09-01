@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, status
-from app.schemas.auth import AuthRegister, AuthLogin, AuthResponse, UserProfile
+from app.schemas.auth import AuthRegister, AuthLogin
 from app.core.supabase_client import supabase, supabase_admin
 from app.core.auth import get_current_user
 

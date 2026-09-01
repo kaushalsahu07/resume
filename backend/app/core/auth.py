@@ -1,4 +1,3 @@
-import jwt
 from fastapi import Depends, HTTPException, Header, status
 from app.core.config import settings
 from app.core.supabase_client import supabase

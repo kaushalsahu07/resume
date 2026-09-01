@@ -106,16 +106,19 @@ def sync_portfolio_full(portfolio_id: str, data: ExtractedPortfolio, client: Cli
     # This ensures exact match with frontend state
     # We must NOT use exclude_none=True because Supabase bulk insert requires all objects to have the exact same keys!
     dumped = data.model_dump()
+    def prepare_item(i, item, sec, p_id):
+        item["portfolio_id"] = p_id
+        item.pop("id", None)
+        if sec in ["education", "experience", "projects"]:
+            item["order"] = i
+        return item
+
     for section in ["education", "experience", "projects", "skills", "achievements", "links"]:
         items = dumped.get(section, [])
         client.table(section).delete().eq("portfolio_id", portfolio_id).execute()
         if items:
-            for i, item in enumerate(items):
-                item["portfolio_id"] = portfolio_id
-                item.pop("id", None)  # let supabase generate real UUIDs
-                if section in ["education", "experience", "projects"]:
-                    item["order"] = i
-            client.table(section).insert(items).execute()
+            prepared_items = [prepare_item(i, item, section, portfolio_id) for i, item in enumerate(items)]
+            client.table(section).insert(prepared_items).execute()
 
     return get_portfolio(portfolio_id, client, user_id)
 

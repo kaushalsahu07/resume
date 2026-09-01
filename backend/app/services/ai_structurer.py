@@ -6,7 +6,6 @@ If one fails (rate limit, quota, network error), it automatically falls through 
 """
 
 import json
-import re
 from typing import Callable, List, Tuple
 
 from groq import Groq

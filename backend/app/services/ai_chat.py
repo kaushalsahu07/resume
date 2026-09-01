@@ -6,7 +6,6 @@ and returns the modified portfolio JSON + a human-readable reply.
 """
 
 import json
-import re
 from typing import Callable, List, Tuple, Any, Dict
 
 from app.core.config import settings
