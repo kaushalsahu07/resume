@@ -7,7 +7,7 @@ The user flow is: **Upload → AI Magic → Share & Shine**. The user uploads a 
 ## Business Purpose
 1. **What business problem is solved?** It reduces the friction of creating a personal portfolio from scratch by instantly converting an existing resume into a structured web format.
 2. **What users use this?** Job seekers, professionals, students, and freelancers who want a quick, well-designed online presence.
-3. **What are the major features?** Resume upload/parsing, WYSIWYG live-preview portfolio editor, section reordering, template switching, and public publishing.
+3. **What are the major features?** Resume upload/parsing, WYSIWYG live-preview portfolio editor, section reordering, template switching, AI chat editing, and public publishing.
 4. **What is the user workflow?** Landing Page -> Register/Login -> Dashboard -> Upload Resume -> AI Parsing -> Editor -> Publish.
 5. **What are the primary entities?** User, Portfolio, and Portfolio Sections (Education, Experience, Projects, Skills, Achievements, Links).
 
@@ -15,22 +15,16 @@ The user flow is: **Upload → AI Magic → Share & Shine**. The user uploads a 
 ### Frontend Framework:
 - **React 18** + **TypeScript**
 - **Vite** (Build Tool)
+- **Tailwind CSS** (v4.3.3)
 
 ### Backend Framework:
-- **FastAPI** (Note: Backend is maintained separately and documented in specs, not present in this repository).
+- **FastAPI** (Python)
 
 ### Database:
 - **PostgreSQL** on **Supabase**
 
 ### Authentication:
-- **Custom JWT Auth** (Tokens stored via `authStorage.ts`).
-
-### State Management:
-- **React Context** (used for Auth via `AuthProvider`). Local component state for UI.
-
-### Styling:
-- **Tailwind CSS** (v4.3.3)
-- No component libraries (custom components required).
+- **Supabase Auth** (JWT Tokens stored via `authStorage.ts`).
 
 ### Infrastructure & Deployment:
 - Frontend: **Netlify**
@@ -39,86 +33,57 @@ The user flow is: **Upload → AI Magic → Share & Shine**. The user uploads a 
 ## Repository Structure
 ```
 resume/
-├── .gemini/          # IDE/Editor configuration
-├── .git/             # Git repository
-├── Ai/               # Documentation specs
-│   └── frontend.md   # Detailed frontend specification and API contract
+├── backend/          # FastAPI Backend application
+│   ├── app/          # Source code (routers, schemas, services, core)
+│   ├── requirements.txt
+│   └── ...
 ├── frontend/         # React Frontend application
-│   ├── .oxlintrc.json
-│   ├── index.html
-│   ├── netlify.toml  # Netlify deployment configuration
-│   ├── package.json
 │   ├── src/          # Source code
-│   │   ├── App.tsx       # Main router setup
-│   │   ├── main.tsx      # React entry point
-│   │   ├── components/   # UI and Layout components
-│   │   ├── hooks/        # Custom hooks (e.g., useAuth)
-│   │   ├── lib/          # Utilities and API client
-│   │   ├── pages/        # Route page components
-│   │   └── types/        # TypeScript interfaces
-│   ├── tsconfig.*.json
-│   └── vite.config.ts
-├── README.md
-└── LICENSE
+│   ├── package.json
+│   └── ...
+├── Ai/               # Documentation
+│   ├── architecture.md
+│   ├── frontend.md
+│   ├── backend.md
+│   └── codebase_memory.md
+└── README.md
 ```
 
 ## System Architecture
-- The repository strictly contains the Frontend codebase.
-- The Backend is external (FastAPI) and communicates via REST API.
-- **Frontend Architecture**: SPA (Single Page Application) using React Router for navigation. Protected routes are wrapped by `AuthedLayout`. The API client currently intercepts requests and provides mock responses until the real backend is integrated.
+- The repository is a monorepo containing both the Frontend and Backend.
+- **Frontend Architecture**: SPA using React Router. Protected routes are wrapped by `AuthedLayout`. Communicates with backend via a custom API client.
+- **Backend Architecture**: FastAPI serving REST endpoints, structured into routers, services, and schemas. Integrates with Supabase for Auth and DB.
 
 ## Authentication Flow
 1. User submits credentials via `/login` or `/register`.
 2. Frontend sends POST request to `/auth/login` or `/auth/register`.
-3. Backend returns a `{ token, user }` object.
+3. Backend proxies to Supabase Auth and returns a `{ token, user }` object.
 4. Token is saved in `authStorage.ts` (localStorage).
-5. `AuthProvider` maintains user session state. On mount, it fetches `/me` with the stored token to validate session.
+5. `AuthProvider` maintains user session state.
 6. API client appends `Authorization: Bearer <token>` to all subsequent requests.
 
 ## Data Flow Diagrams
 **Resume Upload & Parse Flow:**
-User Action (Upload File) ↓ Frontend (`/upload` page) ↓ API (POST `/resume/upload`) ↓ Backend (AI Parsing Logic) ↓ Database (Save Draft Portfolio) ↓ Response (Portfolio Data) ↓ UI Update (Redirect to `/editor/:id`).
+User Action (Upload File) ↓ Frontend (`/upload` page) ↓ API (POST `/resume/upload`) ↓ Backend (AI Parsing Logic via pdfplumber/docx -> Groq/Gemini) ↓ Database (Save Draft Portfolio) ↓ Response (Portfolio Data) ↓ UI Update (Redirect to `/editor`).
 
 **Editor Update Flow:**
 User Action (Edit Text/Reorder) ↓ Frontend State (Optimistic UI) ↓ API (PUT `/portfolios/:id/...`) ↓ Backend (Update Logic) ↓ Database ↓ Response.
 
 **AI Chat Update Flow:**
-User Action (Sends Message) ↓ API (POST `/portfolios/:id/chat`) ↓ Backend (AI interprets intent & modifies state) ↓ Response (Updated Portfolio + AI Reply + Remaining Requests) ↓ UI Update (Chat history & Live preview).
-
-
-## Environment Variables
-- `VITE_API_BASE_URL`: Base URL for the FastAPI backend (e.g., `http://localhost:8000` or production Railway URL).
+User Action (Sends Message) ↓ API (POST `/chat/...`) ↓ Backend (AI interprets intent & modifies state) ↓ Response (Updated Portfolio) ↓ UI Update (Chat history & Live preview).
 
 ## Third Party Integrations
 - `@dnd-kit/core`: Used for drag-and-drop reordering of portfolio sections.
 - `react-hook-form`: Used for form state management and validation.
-
-## Feature Inventory
-- **Authentication**: Login and Registration forms.
-- **Dashboard**: View all portfolios.
-- **Resume Upload**: File upload interface with simulated AI parsing states.
-- **Portfolio Editor**: Two-pane layout with form controls and a live preview. Allows editing sections, reordering, and template switching. Includes a floating AI Chat widget for natural language portfolio modifications (limited to 1000 requests/day).
-- **Public Portfolio Viewer**: Renders the chosen template for a published portfolio.
+- `pdfplumber` & `python-docx`: Used for parsing resume files.
+- `Groq` & `Gemini`: Used for AI structuring and chat interactions.
 
 ## Technical Debt / Known Risks
-- AI parsing relies entirely on the external backend and requires handling markdown-wrapped JSON gracefully. (Addressed with robust `_clean_json` payload extraction).
+- AI parsing relies entirely on the external AI providers (Groq/Gemini) and requires handling markdown-wrapped JSON gracefully. (Addressed with robust `_clean_json` payload extraction).
 - Groq free tier imposes strict TPM limits (8000 tokens), which requires careful `max_tokens` configuration to prevent `413 Request Entity Too Large` errors. (Addressed by keeping `max_tokens=2048`).
 
 ## Recent Updates
-- **AI Providers Switched**: Anthropic (Claude) has been completely removed from the project in favor of Groq (primary, using `qwen/qwen3.8-27b`) with fallback to Gemini (using `gemini-3.6-flash`).
-- **Robust JSON Extraction**: Improved the `_clean_json` method to safely extract JSON payloads even when AI models ignore system prompts and output conversational text or markdown code fences.
-- **Dashboard Delete Bug Fix**: Fixed an issue where the frontend hit an unhandled `204 No Content` error, and bypassed Supabase user-side RLS limitations by utilizing `supabase_admin` to securely delete portfolios (after verifying ownership) and explicitly dropping child section rows.
+- **AI Providers Switched**: Anthropic (Claude) has been completely removed from the project in favor of Groq (primary) with fallback to Gemini.
+- **Robust JSON Extraction**: Improved the `_clean_json` method to safely extract JSON payloads even when AI models ignore system prompts.
 - **API Connection**: The frontend `apiClient.ts` has been connected to the live backend; it is no longer mocking responses.
-
-## Development Workflow
-1. Run `npm run dev` in the `frontend` directory.
-2. Use Vite for hot module replacement.
-3. Lint with `oxlint` (`npm run lint`).
-
-## Deployment Process
-- Deploys to Netlify.
-- `netlify.toml` handles SPA redirects (`/* /index.html 200`).
-
-## Future Recommendations
-- Add additional templates and layout options.
-- Implement robust analytics for public portfolio views.
+- **Monorepo structure**: The backend codebase is now integrated into this repository under the `backend` folder.

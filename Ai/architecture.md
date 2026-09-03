@@ -1,51 +1,52 @@
 # System Architecture
 
 ## Overview
-The "Resume-to-Portfolio" application follows a decoupled client-server architecture. The frontend is a React Single Page Application (SPA) that communicates with a Python FastAPI backend (maintained separately) via REST APIs. Data is persisted in a PostgreSQL database hosted on Supabase.
+The "Resume-to-Portfolio" application follows a decoupled client-server architecture within a monorepo-style structure. The frontend is a React Single Page Application (SPA) built with Vite, communicating with a Python FastAPI backend via REST APIs. Data is persisted in a PostgreSQL database hosted on Supabase.
 
 ## Architecture Map
 
-```
-Browser (User)
-  │
-  ▼
-[ Frontend ]
-  Netlify Hosting
-  React 18 + Vite
-  Tailwind CSS
-  React Router
-  │
-  ├─ API Layer (src/lib/apiClient.ts)
-  │    (Handles Auth Headers & JSON serialization)
-  │
-  ▼
-[ Backend ] (External System)
-  Railway Hosting
-  FastAPI (Python)
-  │
-  ├─ AI Parsing Service (Resume extraction)
-  ├─ Business Logic & Validation
-  ├─ Auth Service (JWT Generation)
-  │
-  ▼
-[ Database ] (External System)
-  Supabase
-  PostgreSQL
+```mermaid
+graph TD
+    User([Browser / User]) --> Frontend
+    
+    subgraph Frontend [Frontend (React + Vite)]
+        Router[React Router]
+        Templates[Portfolio Templates]
+        APIClient[API Client]
+    end
+    
+    subgraph Backend [Backend (FastAPI)]
+        AuthService[Auth Service]
+        PortfolioService[Portfolio CRUD]
+        AIService[AI Chat & Resume Parsing]
+    end
+    
+    subgraph External [External Services]
+        Supabase[(Supabase PostgreSQL)]
+        Groq[Groq AI]
+        Gemini[Gemini AI]
+    end
+    
+    Frontend -- REST API --> Backend
+    Backend -- SQL / REST --> Supabase
+    Backend -- API --> Groq
+    Backend -- API --> Gemini
 ```
 
 ## Component Relationships
 
 ### Frontend
 - **Routing**: `App.tsx` handles top-level routing, wrapping protected routes in `<AuthedLayout />`.
-- **State Management**: `AuthProvider` (Context) holds the current user state globally. Page-level state is managed via local React state and `react-hook-form`.
-- **API Client**: A custom fetch wrapper (`apiClient.ts`) intercepts requests to append the JWT token and manages mock vs. real network calls.
+- **State Management**: `AuthProvider` (Context) holds the current user state globally. Page-level state is managed via local React state.
+- **Templates**: Various portfolio templates (`ClassicProfessionalTemplate`, `DarkGridTemplate`, etc.) render portfolio data identically across Editor and Public view.
+- **API Client**: A custom fetch wrapper (`apiClient.ts`) intercepts requests to append JWT tokens and handles network communication.
 
-### Backend (Based on Contract)
-- **Auth Routes**: Handles JWT issuance and validation.
-- **Portfolio Routes**: CRUD operations for portfolios and individual resume sections.
-- **AI Upload Route**: Accepts multipart form data, processes the resume, and returns structured portfolio data.
+### Backend
+- **Auth Routes (`routers/auth.py`)**: Handles JWT issuance, registration, and user retrieval using Supabase auth.
+- **Portfolio Routes (`routers/portfolios.py`)**: CRUD operations for portfolios, including publishing, unpublishing, and reordering sections.
+- **AI Services (`services/ai_structurer.py`, `services/ai_chat.py`)**: Parses uploaded resumes (PDF/DOCX) using `resume_parser.py`, then structures them using Groq/Gemini. The chat feature allows users to query portfolio data dynamically.
+- **Resume Upload (`routers/resume.py`)**: Accepts multipart form data to initiate the extraction and structuring process.
 
 ### External Services
-- **AI/LLM Provider**: (Implicitly part of the backend) Used for parsing resume text into structured JSON.
-- **Supabase**: Postgres Database hosting.
-- **Netlify/Railway**: Deployment platforms for Frontend and Backend, respectively.
+- **AI/LLM Providers**: Groq and Google Gemini are integrated for rapid AI parsing and chat interactions.
+- **Supabase**: Postgres Database and Auth provider.
