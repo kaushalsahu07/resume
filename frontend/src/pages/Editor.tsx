@@ -1065,7 +1065,7 @@ export default function Editor() {
               onChange={e => handleUpdate({ slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') })}
               placeholder="yourname"
             />
-            <span className="text-slate-500 font-medium">.portfolio.me</span>
+            <span className="text-slate-500 font-medium">.portfolyo.works</span>
           </div>
 
           {/* Publish & Share button */}
@@ -1121,7 +1121,7 @@ export default function Editor() {
                   <div className="w-2.5 h-2.5 rounded-full bg-emerald-400" />
                 </div>
                 <div className="flex-1 max-w-xs mx-auto bg-white rounded-md px-2.5 py-0.5 text-[11px] text-slate-600 text-center font-mono border border-slate-200 shadow-2xs truncate">
-                  {portfolio.slug}.portfolio.me
+                  {portfolio.slug}.portfolyo.works
                 </div>
               </div>
               {/* Desktop Render (Scaled Iframe) */}

@@ -20,7 +20,7 @@ export function getSubdomainFromHostname(hostname = window.location.hostname): s
 
     if (!isLocalhost && parts.length >= 3 && !isPaas) {
       const sub = parts[0].toLowerCase()
-      if (!['www', 'app', 'api', 'admin', 'portfolio'].includes(sub)) {
+      if (!['www', 'app', 'api', 'admin', 'portfolio', 'portfolyo'].includes(sub)) {
         return sub
       }
     }

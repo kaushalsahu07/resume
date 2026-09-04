@@ -45,7 +45,7 @@ export default function Landing() {
     },
     {
       q: "Can I connect a custom domain or export the code?",
-      a: "You get a free permanent shareable URL (yourname.portfolio.me). You can share it directly on job applications, LinkedIn, and email signatures."
+      a: "You get a free permanent shareable URL (yourname.portfolyo.works). You can share it directly on job applications, LinkedIn, and email signatures."
     }
   ]
 
@@ -190,7 +190,7 @@ export default function Landing() {
                 </div>
                 <div className="flex items-center gap-1.5 bg-slate-100/90 border border-slate-200 px-3 py-1 rounded-full text-xs font-semibold text-slate-600 truncate max-w-[200px] sm:max-w-none">
                   <Globe className="w-3 h-3 text-slate-400 shrink-0" />
-                  <span className="truncate">jane.portfolio.me</span>
+                  <span className="truncate">jane.portfolyo.works</span>
                 </div>
               </div>
 
@@ -480,7 +480,7 @@ export default function Landing() {
                     </li>
                     <li className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
-                      <span>Instant 1-click shareable URL (<span className="text-blue-600">you.portfolio.me</span>)</span>
+                      <span>Instant 1-click shareable URL (<span className="text-blue-600">you.portfolyo.works</span>)</span>
                     </li>
                     <li className="flex items-start gap-2.5">
                       <Check className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
@@ -552,7 +552,7 @@ export default function Landing() {
                   Free Custom Subdomain
                 </h4>
                 <p className="text-slate-500 text-sm leading-relaxed">
-                  Get your own shareable live link (<span className="text-slate-800 font-medium">name.portfolio.me</span>) to share on applications & LinkedIn.
+                  Get your own shareable live link (<span className="text-slate-800 font-medium">name.portfolyo.works</span>) to share on applications & LinkedIn.
                 </p>
               </div>
 

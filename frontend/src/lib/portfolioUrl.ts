@@ -20,8 +20,8 @@ export function getPortfolioPublicUrl(slug: string): string {
     return `${protocol}//${hostname}${port}/p/${slug}`
   }
 
-  // Production custom domain (e.g. portfolio.me)
+  // Production custom domain (e.g. portfolyo.works)
   const rootDomain = hostname.replace(/^(www\.|app\.)/, '')
-  const baseDomain = rootDomain || 'portfolio.me'
+  const baseDomain = rootDomain || 'portfolyo.works'
   return `${protocol}//${slug}.${baseDomain}${port}`
 }
