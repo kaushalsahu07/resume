@@ -1,8 +1,6 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { 
-  ArrowLeft, ArrowRight, Laptop, Tablet, Smartphone, Wand2
-} from 'lucide-react'
+import { ArrowLeft, ArrowRight, Wand2 } from 'lucide-react'
 import { templates, getTemplateById } from '../components/templates'
 import type { Portfolio } from '../types/portfolio'
 
@@ -47,7 +45,6 @@ export const mockPortfolio: Portfolio = {
 
 export default function Demo() {
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('dark-grid')
-  const [viewport, setViewport] = useState<'desktop' | 'tablet' | 'mobile'>('desktop')
 
   const ActiveTemplateComponent = getTemplateById(selectedTemplateId).component
 
@@ -63,44 +60,13 @@ export default function Demo() {
           <span className="hidden md:inline">Back</span>
         </Link>
 
-        {/* Viewport switcher */}
-        <div className="hidden sm:flex items-center gap-1 bg-slate-100 p-1 rounded-full border border-slate-200 shadow-2xs">
-          <button
-            onClick={() => setViewport('desktop')}
-            className={`p-1.5 rounded-full transition-all ${
-              viewport === 'desktop' ? 'bg-slate-950 text-white shadow-xs' : 'text-slate-500 hover:text-slate-900'
-            }`}
-            title="Desktop View"
-          >
-            <Laptop className="w-3.5 h-3.5" />
-          </button>
-          <button
-            onClick={() => setViewport('tablet')}
-            className={`p-1.5 rounded-full transition-all ${
-              viewport === 'tablet' ? 'bg-slate-950 text-white shadow-xs' : 'text-slate-500 hover:text-slate-900'
-            }`}
-            title="Tablet View"
-          >
-            <Tablet className="w-3.5 h-3.5" />
-          </button>
-          <button
-            onClick={() => setViewport('mobile')}
-            className={`p-1.5 rounded-full transition-all ${
-              viewport === 'mobile' ? 'bg-slate-950 text-white shadow-xs' : 'text-slate-500 hover:text-slate-900'
-            }`}
-            title="Mobile View"
-          >
-            <Smartphone className="w-3.5 h-3.5" />
-          </button>
-        </div>
-
-        {/* Template switcher pill */}
-        <div className="flex bg-slate-100 p-1 rounded-full border border-slate-200 overflow-x-auto max-w-[55vw] sm:max-w-none shadow-inner">
+        {/* Template switcher pills */}
+        <div className="flex bg-slate-100 p-1 rounded-full border border-slate-200 overflow-x-auto max-w-[70vw] sm:max-w-none shadow-inner">
           {templates.map((t) => (
             <button 
               key={t.id}
               onClick={() => setSelectedTemplateId(t.id)}
-              className={`px-3 sm:px-4 py-1 rounded-full font-bold text-xs transition-all duration-200 whitespace-nowrap ${
+              className={`px-3.5 sm:px-4 py-1.5 rounded-full font-bold text-xs transition-all duration-200 whitespace-nowrap ${
                 selectedTemplateId === t.id 
                   ? 'bg-slate-950 text-white shadow-xs scale-[1.02]' 
                   : 'text-slate-600 hover:text-slate-950 hover:bg-slate-200/50'
@@ -122,18 +88,9 @@ export default function Demo() {
         </Link>
       </header>
 
-      <main className="flex-1 w-full mx-auto p-4 sm:p-6 flex justify-center items-start">
-        <div
-          className={`transition-all duration-300 w-full ${
-            viewport === 'mobile'
-              ? 'max-w-[390px] shadow-2xl rounded-3xl overflow-hidden border-4 border-slate-900 bg-white'
-              : viewport === 'tablet'
-              ? 'max-w-[768px] shadow-2xl rounded-3xl overflow-hidden border-4 border-slate-900 bg-white'
-              : 'max-w-6xl shadow-xl rounded-3xl overflow-hidden border border-slate-200 bg-white'
-          }`}
-        >
-          <ActiveTemplateComponent portfolio={{ ...mockPortfolio, templateId: selectedTemplateId }} />
-        </div>
+      {/* Full Width Natural Responsive Template View */}
+      <main className="flex-1 w-full">
+        <ActiveTemplateComponent portfolio={{ ...mockPortfolio, templateId: selectedTemplateId }} />
       </main>
     </div>
   )

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, status
-from app.schemas.auth import AuthRegister, AuthLogin
+from app.schemas.auth import AuthRegister, AuthLogin, AuthResetPassword, AuthUpdatePassword
 from app.core.supabase_client import supabase, supabase_admin
 from app.core.auth import get_current_user
 
@@ -64,4 +64,32 @@ def get_me(user_id: str = Depends(get_current_user)):
         raise
     except Exception as e:
         print("Get me error:", e)
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/reset-password")
+def reset_password(data: AuthResetPassword):
+    try:
+        from app.core.config import settings
+        redirect_url = f"{settings.CORS_ALLOWED_ORIGIN}/update-password"
+        # This sends the recovery email automatically via Supabase's built-in SMTP
+        supabase.auth.reset_password_for_email(
+            data.email,
+            options={"redirect_to": redirect_url}
+        )
+    except Exception as e:
+        print("Reset password error:", e)
+    # Always return success to prevent email enumeration
+    return {"message": "If an account with that email exists, a password reset link has been sent."}
+
+
+@router.post("/update-password")
+def update_password(data: AuthUpdatePassword, user_id: str = Depends(get_current_user)):
+    try:
+        response = supabase_admin.auth.admin.update_user_by_id(
+            user_id,
+            {"password": data.password}
+        )
+        return {"message": "Password updated successfully."}
+    except Exception as e:
+        print("Update password error:", e)
         raise HTTPException(status_code=400, detail=str(e))

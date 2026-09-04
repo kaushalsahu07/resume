@@ -73,7 +73,7 @@ export default function DarkGridTemplate({ portfolio }: { portfolio: Portfolio }
 
   return (
     <div className="relative min-h-screen overflow-x-hidden bg-[#050b09] text-white antialiased selection:bg-emerald-500 selection:text-black">
-      <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+      <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
         <div className="absolute -top-32 left-1/2 h-[32rem] w-[32rem] -translate-x-1/2 rounded-full bg-emerald-500/10 blur-[150px]" />
         <div className="absolute left-0 top-24 h-80 w-80 rounded-full bg-green-500/10 blur-[120px]" />
         <div className="absolute bottom-0 right-0 h-96 w-96 rounded-full bg-emerald-600/10 blur-[140px]" />
@@ -154,47 +154,47 @@ export default function DarkGridTemplate({ portfolio }: { portfolio: Portfolio }
       </header>
 
       <main className="relative z-10 mx-auto w-full max-w-6xl px-4 sm:px-6">
-        <section id="home" className="pb-16 pt-8 sm:pb-24 sm:pt-16">
-          <div className="grid items-center gap-8 lg:grid-cols-12 lg:gap-12">
-            <div className="space-y-6 text-center lg:col-span-7 lg:text-left">
-              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-950/40 px-3 py-1.5 text-[11px] uppercase tracking-[0.16em] text-emerald-200">
+        <section id="home" className="pt-5 pb-8 sm:pt-16 sm:pb-24">
+          <div className="grid items-center gap-6 lg:grid-cols-12 lg:gap-12">
+            <div className="space-y-3.5 sm:space-y-6 text-center lg:col-span-7 lg:text-left">
+              <div className="inline-flex items-center gap-2 rounded-full border border-emerald-500/30 bg-emerald-950/40 px-3 py-1 text-[10px] sm:text-[11px] uppercase tracking-[0.16em] text-emerald-200">
                 <span className="h-2 w-2 rounded-full bg-emerald-400" />
                 <span>Available for work</span>
               </div>
 
-              <div className="space-y-3">
-                <p className="text-sm font-medium text-zinc-400 sm:text-base">
+              <div className="space-y-2 sm:space-y-3">
+                <p className="text-xs sm:text-base font-medium text-zinc-400">
                   Hello, I’m <span className="font-semibold text-white">{name}</span>
                 </p>
-                <h1 className="text-4xl font-black leading-[0.95] tracking-[-0.06em] text-white sm:text-5xl lg:text-6xl">
+                <h1 className="text-2xl sm:text-5xl lg:text-6xl font-black leading-[1.05] sm:leading-[0.95] tracking-[-0.04em] sm:tracking-[-0.06em] text-white">
                   Building <span className="text-emerald-400">clean, fast</span>
                   <br />
                   digital products.
                 </h1>
-                <p className="text-xs uppercase tracking-[0.2em] text-emerald-300/80 sm:text-sm">
+                <p className="text-[11px] sm:text-sm uppercase tracking-[0.18em] text-emerald-300/80">
                   {currentRole ? `${currentRole.role} • ${currentRole.company}` : 'Product Engineer • UI Systems'}
                 </p>
               </div>
 
-              <p className="mx-auto max-w-xl text-sm leading-relaxed text-zinc-300 lg:mx-0 lg:text-base">
+              <p className="mx-auto max-w-xl text-xs sm:text-base leading-relaxed text-zinc-300 lg:mx-0">
                 {summary}
               </p>
 
-              <div className="flex flex-col items-center gap-3 pt-2 sm:flex-row lg:justify-start">
+              <div className="flex flex-row items-center justify-center lg:justify-start gap-2.5 pt-1 sm:pt-2 w-full sm:w-auto">
                 <a
                   href="#projects"
                   onClick={() => handleNavClick('projects')}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-full bg-emerald-400 px-6 py-3 text-sm font-bold text-[#062019] shadow-lg shadow-emerald-900/40 transition hover:translate-y-[-1px] hover:bg-emerald-300 sm:w-auto"
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-full bg-emerald-400 px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-bold text-[#062019] shadow-lg shadow-emerald-900/40 transition hover:translate-y-[-1px] hover:bg-emerald-300"
                 >
                   <span>View work</span>
-                  <ArrowRight className="h-4 w-4" />
+                  <ArrowRight className="h-3.5 w-3.5" />
                 </a>
                 <a
                   href="#contact"
                   onClick={() => handleNavClick('contact')}
-                  className="inline-flex w-full items-center justify-center gap-2 rounded-full border border-zinc-700 bg-[#0b1512] px-6 py-3 text-sm font-medium text-zinc-100 transition hover:border-emerald-400 hover:text-emerald-200 sm:w-auto"
+                  className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 rounded-full border border-zinc-700 bg-[#0b1512] px-4 sm:px-6 py-2.5 sm:py-3 text-xs sm:text-sm font-medium text-zinc-100 transition hover:border-emerald-400 hover:text-emerald-200"
                 >
-                  <Mail className="h-4 w-4 text-emerald-300" />
+                  <Mail className="h-3.5 w-3.5 text-emerald-300" />
                   <span>Get in touch</span>
                 </a>
               </div>
@@ -203,32 +203,32 @@ export default function DarkGridTemplate({ portfolio }: { portfolio: Portfolio }
             <div className="lg:col-span-5">
               <div className="relative mx-auto max-w-md">
                 <div className="absolute inset-0 -z-10 rounded-[2rem] bg-emerald-500/10 blur-2xl" />
-                <div className="rounded-[28px] border border-emerald-500/25 bg-[#0a1713]/95 p-5 shadow-2xl shadow-emerald-950/40 backdrop-blur-xl sm:p-6">
-                  <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                    <div className="flex items-center gap-2">
-                      <span className="h-2.5 w-2.5 rounded-full bg-red-400" />
-                      <span className="h-2.5 w-2.5 rounded-full bg-amber-400" />
-                      <span className="h-2.5 w-2.5 rounded-full bg-emerald-400" />
+                <div className="rounded-2xl sm:rounded-[28px] border border-emerald-500/25 bg-[#0a1713]/95 p-4 sm:p-6 shadow-2xl shadow-emerald-950/40 backdrop-blur-xl">
+                  <div className="flex items-center justify-between border-b border-white/10 pb-2.5 sm:pb-3">
+                    <div className="flex items-center gap-1.5 sm:gap-2">
+                      <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-red-400" />
+                      <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-amber-400" />
+                      <span className="h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-emerald-400" />
                     </div>
                     <span className="text-[10px] uppercase tracking-[0.2em] text-emerald-300/80">portfolio</span>
                   </div>
 
-                  <div className="mt-5 space-y-2 font-mono text-xs text-zinc-300 sm:text-sm">
+                  <div className="mt-3 sm:mt-5 space-y-1.5 font-mono text-[11px] sm:text-sm text-zinc-300">
                     <div className="text-emerald-300">const profile = {'{'}</div>
-                    <div className="pl-4">name: <span className="text-emerald-200">"{name}"</span>,</div>
-                    <div className="pl-4">role: <span className="text-emerald-200">"{currentRole?.role || 'Senior Product Engineer'}"</span>,</div>
-                    <div className="pl-4">status: <span className="text-amber-300">"open to opportunities"</span>,</div>
-                    <div className="pl-4">stack: [<span className="text-lime-300">"React"</span>, <span className="text-lime-300">"TypeScript"</span>, <span className="text-lime-300">"UX"</span>],</div>
+                    <div className="pl-3 sm:pl-4">name: <span className="text-emerald-200">"{name}"</span>,</div>
+                    <div className="pl-3 sm:pl-4">role: <span className="text-emerald-200">"{currentRole?.role || 'Senior Product Engineer'}"</span>,</div>
+                    <div className="pl-3 sm:pl-4">status: <span className="text-amber-300">"open to opportunities"</span>,</div>
+                    <div className="pl-3 sm:pl-4">stack: [<span className="text-lime-300">"React"</span>, <span className="text-lime-300">"TypeScript"</span>],</div>
                     <div className="text-emerald-300">{'}'}</div>
                   </div>
 
-                  <div className="mt-6 grid grid-cols-2 gap-3">
-                    <div className="rounded-2xl border border-emerald-500/20 bg-emerald-950/25 p-3 text-center">
-                      <div className="text-2xl font-bold text-emerald-300">{portfolio.projects?.length || 5}+</div>
+                  <div className="mt-3.5 sm:mt-6 grid grid-cols-2 gap-2 sm:gap-3">
+                    <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/25 p-2.5 sm:p-3 text-center">
+                      <div className="text-lg sm:text-2xl font-bold text-emerald-300">{portfolio.projects?.length || 5}+</div>
                       <div className="text-[10px] uppercase tracking-[0.18em] text-zinc-400">Projects</div>
                     </div>
-                    <div className="rounded-2xl border border-emerald-500/20 bg-emerald-950/25 p-3 text-center">
-                      <div className="text-2xl font-bold text-emerald-300">{portfolio.experience?.length ? portfolio.experience.length * 2 : 6}+</div>
+                    <div className="rounded-xl border border-emerald-500/20 bg-emerald-950/25 p-2.5 sm:p-3 text-center">
+                      <div className="text-lg sm:text-2xl font-bold text-emerald-300">{portfolio.experience?.length ? portfolio.experience.length * 2 : 6}+</div>
                       <div className="text-[10px] uppercase tracking-[0.18em] text-zinc-400">Years</div>
                     </div>
                   </div>

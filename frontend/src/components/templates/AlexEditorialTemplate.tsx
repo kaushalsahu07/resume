@@ -16,10 +16,10 @@ export default function AlexEditorialTemplate({ portfolio }: { portfolio: Portfo
   ]
 
   return (
-    <div className="min-h-screen w-full overflow-x-hidden bg-[#0a0e0a] text-white antialiased" style={{ fontFamily: 'Menlo, Monaco, Courier New, monospace' }}>
+    <div className="min-h-screen w-full overflow-x-hidden bg-[#0a0e0a] text-white antialiased relative" style={{ fontFamily: 'Menlo, Monaco, Courier New, monospace' }}>
       <div className="relative">
         {/* Grid background */}
-        <div className="fixed inset-0 z-0 pointer-events-none opacity-10">
+        <div className="absolute inset-0 z-0 pointer-events-none opacity-10">
           <div
             className="absolute inset-0"
             style={{
@@ -30,7 +30,7 @@ export default function AlexEditorialTemplate({ portfolio }: { portfolio: Portfo
         </div>
 
         {/* Glowing orbs */}
-        <div className="fixed inset-0 z-0 pointer-events-none overflow-hidden">
+        <div className="absolute inset-0 z-0 pointer-events-none overflow-hidden">
           <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-[#00ff41]/10 blur-[120px]" />
           <div className="absolute -bottom-32 -right-32 w-96 h-96 rounded-full bg-[#00ff41]/5 blur-[120px]" />
         </div>

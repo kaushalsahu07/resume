@@ -8,3 +8,9 @@ class AuthRegister(BaseModel):
 class AuthLogin(BaseModel):
     email: EmailStr
     password: str
+
+class AuthResetPassword(BaseModel):
+    email: EmailStr
+
+class AuthUpdatePassword(BaseModel):
+    password: str

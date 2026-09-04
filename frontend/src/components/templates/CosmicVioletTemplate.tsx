@@ -94,7 +94,7 @@ export default function CosmicVioletTemplate({ portfolio }: { portfolio: Portfol
     <div className="relative min-h-screen bg-[#110720] text-white font-sans selection:bg-purple-600 selection:text-white overflow-x-hidden w-full">
       
       {/* ─── Ambient Cosmic Background Lights (Optimized for Mobile Performance) ─── */}
-      <div className="fixed inset-0 pointer-events-none z-0 overflow-hidden">
+      <div className="absolute inset-0 pointer-events-none z-0 overflow-hidden">
         <div className="absolute -top-[10%] -left-[10%] w-[90vw] sm:w-[50vw] h-[90vw] sm:h-[50vw] max-w-[600px] max-h-[600px] rounded-full bg-gradient-to-br from-purple-900/30 via-indigo-900/20 to-transparent blur-[60px] sm:blur-[130px]" />
         <div className="absolute top-[30%] -right-[15%] w-[85vw] sm:w-[45vw] h-[85vw] sm:h-[45vw] max-w-[550px] max-h-[550px] rounded-full bg-gradient-to-bl from-fuchsia-900/25 via-purple-950/25 to-transparent blur-[70px] sm:blur-[140px]" />
         <div className="absolute -bottom-[10%] -left-[10%] w-[75vw] sm:w-[40vw] h-[75vw] sm:h-[40vw] max-w-[500px] max-h-[500px] rounded-full bg-purple-950/25 blur-[70px] sm:blur-[150px]" />
@@ -220,16 +220,16 @@ export default function CosmicVioletTemplate({ portfolio }: { portfolio: Portfol
       <main className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 w-full">
         
         {/* ─── Hero Section ─── */}
-        <section id="home" className="pt-8 sm:pt-16 pb-12 sm:pb-20 scroll-mt-20">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+        <section id="home" className="pt-6 sm:pt-14 pb-8 sm:pb-18 scroll-mt-20">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-12 items-center">
             
             {/* Left Narrative Column */}
-            <div className="lg:col-span-7 space-y-5 sm:space-y-7 text-center lg:text-left">
+            <div className="lg:col-span-7 space-y-4 sm:space-y-6 text-center lg:text-left">
               
               {/* Top Pill Badges Row */}
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5">
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 sm:gap-2.5">
                 {/* Greeting Badge */}
-                <div className="inline-flex items-center gap-2 px-3.5 sm:px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-950/90 via-purple-900/60 to-purple-950/90 border border-purple-500/40 backdrop-blur-md shadow-lg shadow-purple-950/50">
+                <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-gradient-to-r from-purple-950/90 via-purple-900/60 to-purple-950/90 border border-purple-500/40 backdrop-blur-md shadow-lg shadow-purple-950/50">
                   <span className="w-2 h-2 rounded-full bg-purple-400 animate-pulse" />
                   <span className="text-purple-200 text-xs sm:text-sm font-semibold">
                     Hello, I'm <span className="text-white font-bold">{name}</span>
@@ -238,7 +238,7 @@ export default function CosmicVioletTemplate({ portfolio }: { portfolio: Portfol
                 </div>
 
                 {/* Live Availability Status */}
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/50 border border-emerald-500/30 text-emerald-300 text-xs font-medium backdrop-blur-md">
+                <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-950/50 border border-emerald-500/30 text-emerald-300 text-xs font-medium backdrop-blur-md">
                   <span className="relative flex h-2 w-2">
                     <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
                     <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
@@ -248,8 +248,8 @@ export default function CosmicVioletTemplate({ portfolio }: { portfolio: Portfol
               </div>
 
               {/* Catchy Punchline Headline */}
-              <div className="space-y-3">
-                <h1 className="text-3xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.12] text-balance">
+              <div className="space-y-2.5 sm:space-y-3">
+                <h1 className="text-2xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-[1.15] text-balance">
                   Building{' '}
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-purple-300 via-fuchsia-200 to-indigo-200 font-black">
                     high-impact
