@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, Depends, status
+from fastapi import APIRouter, HTTPException, Depends, status, Request
 from app.schemas.auth import AuthRegister, AuthLogin, AuthResetPassword, AuthUpdatePassword, AuthChangeEmail, AuthChangePassword
 from app.core.supabase_client import supabase, supabase_admin
 from app.core.auth import get_current_user
@@ -74,10 +74,15 @@ def get_me(user_id: str = Depends(get_current_user)):
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.post("/reset-password")
-def reset_password(data: AuthResetPassword):
+def reset_password(data: AuthResetPassword, request: Request):
     try:
         from app.core.config import settings
-        redirect_url = f"{settings.CORS_ALLOWED_ORIGIN}/update-password"
+        # Use origin from request if available (for deployed frontends), else fallback to settings
+        origin = request.headers.get("origin") or request.headers.get("referer", "").rstrip("/")
+        if not origin:
+            origin = settings.CORS_ALLOWED_ORIGIN
+            
+        redirect_url = f"{origin}/update-password"
         # This sends the recovery email automatically via Supabase's built-in SMTP
         supabase.auth.reset_password_for_email(
             data.email,
@@ -136,7 +141,7 @@ def change_email(data: AuthChangeEmail, user_id: str = Depends(get_current_user)
 
 
 @router.post("/change-password")
-def change_password(data: AuthChangePassword, user_id: str = Depends(get_current_user)):
+def change_password(data: AuthChangePassword, request: Request, user_id: str = Depends(get_current_user)):
     """Send a password reset email after verifying the current password."""
     try:
         # Get user's current email
@@ -156,7 +161,12 @@ def change_password(data: AuthChangePassword, user_id: str = Depends(get_current
 
         # Send password reset email (same as forgot password flow)
         from app.core.config import settings
-        redirect_url = f"{settings.CORS_ALLOWED_ORIGIN}/update-password"
+        # Use origin from request if available (for deployed frontends), else fallback to settings
+        origin = request.headers.get("origin") or request.headers.get("referer", "").rstrip("/")
+        if not origin:
+            origin = settings.CORS_ALLOWED_ORIGIN
+            
+        redirect_url = f"{origin}/update-password"
         supabase.auth.reset_password_for_email(
             current_email,
             options={"redirect_to": redirect_url}
