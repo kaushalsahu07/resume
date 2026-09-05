@@ -14,3 +14,10 @@ class AuthResetPassword(BaseModel):
 
 class AuthUpdatePassword(BaseModel):
     password: str
+
+class AuthChangeEmail(BaseModel):
+    current_password: str
+    new_email: EmailStr
+
+class AuthChangePassword(BaseModel):
+    current_password: str

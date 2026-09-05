@@ -12,6 +12,7 @@ import Editor from './pages/Editor'
 import PublicPortfolio, { getSubdomainFromHostname } from './pages/PublicPortfolio'
 import Demo from './pages/Demo'
 import LivePreview from './pages/LivePreview'
+import Account from './pages/Account'
 
 export default function App() {
   const subdomain = getSubdomainFromHostname()
@@ -34,6 +35,7 @@ export default function App() {
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/upload" element={<Upload />} />
             <Route path="/editor/:portfolioId" element={<Editor />} />
+            <Route path="/account" element={<Account />} />
           </Route>
 
           {/* Subdomain Catch-All */}

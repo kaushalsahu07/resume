@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, status
-from app.schemas.auth import AuthRegister, AuthLogin, AuthResetPassword, AuthUpdatePassword
+from app.schemas.auth import AuthRegister, AuthLogin, AuthResetPassword, AuthUpdatePassword, AuthChangeEmail, AuthChangePassword
 from app.core.supabase_client import supabase, supabase_admin
 from app.core.auth import get_current_user
 
@@ -59,7 +59,14 @@ def get_me(user_id: str = Depends(get_current_user)):
         res = supabase_admin.table("profiles").select("*").eq("id", user_id).single().execute()
         if not res.data:
             raise HTTPException(status_code=404, detail="Profile not found")
-        return res.data
+        
+        # Fetch current email from auth user (profiles table doesn't store email)
+        user_resp = supabase_admin.auth.admin.get_user_by_id(user_id)
+        profile = res.data
+        if user_resp and user_resp.user:
+            profile["email"] = user_resp.user.email
+        
+        return profile
     except HTTPException:
         raise
     except Exception as e:
@@ -92,4 +99,72 @@ def update_password(data: AuthUpdatePassword, user_id: str = Depends(get_current
         return {"message": "Password updated successfully."}
     except Exception as e:
         print("Update password error:", e)
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/change-email")
+def change_email(data: AuthChangeEmail, user_id: str = Depends(get_current_user)):
+    """Change user's email after verifying their current password."""
+    try:
+        # Get user's current email
+        user_resp = supabase_admin.auth.admin.get_user_by_id(user_id)
+        if not user_resp or not user_resp.user:
+            raise HTTPException(status_code=404, detail="User not found")
+        current_email = user_resp.user.email
+
+        # Verify current password
+        try:
+            supabase.auth.sign_in_with_password({
+                "email": current_email,
+                "password": data.current_password
+            })
+        except Exception:
+            raise HTTPException(status_code=401, detail="Current password is incorrect")
+
+        # Password verified — change email directly via admin API
+        supabase_admin.auth.admin.update_user_by_id(
+            user_id,
+            {"email": data.new_email, "email_confirm": True}
+        )
+
+        return {"message": "Your email has been changed successfully."}
+    except HTTPException:
+        raise
+    except Exception as e:
+        print("Change email error:", e)
+        raise HTTPException(status_code=400, detail=str(e))
+
+
+@router.post("/change-password")
+def change_password(data: AuthChangePassword, user_id: str = Depends(get_current_user)):
+    """Send a password reset email after verifying the current password."""
+    try:
+        # Get user's current email
+        user_resp = supabase_admin.auth.admin.get_user_by_id(user_id)
+        if not user_resp or not user_resp.user:
+            raise HTTPException(status_code=404, detail="User not found")
+        current_email = user_resp.user.email
+
+        # Verify current password
+        try:
+            supabase.auth.sign_in_with_password({
+                "email": current_email,
+                "password": data.current_password
+            })
+        except Exception:
+            raise HTTPException(status_code=401, detail="Current password is incorrect")
+
+        # Send password reset email (same as forgot password flow)
+        from app.core.config import settings
+        redirect_url = f"{settings.CORS_ALLOWED_ORIGIN}/update-password"
+        supabase.auth.reset_password_for_email(
+            current_email,
+            options={"redirect_to": redirect_url}
+        )
+
+        return {"message": "A password reset link has been sent to your email. Please check your inbox."}
+    except HTTPException:
+        raise
+    except Exception as e:
+        print("Change password error:", e)
         raise HTTPException(status_code=400, detail=str(e))

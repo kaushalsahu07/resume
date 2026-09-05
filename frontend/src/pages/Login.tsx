@@ -49,11 +49,6 @@ export default function Login() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
-          {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2.5 rounded-xl text-xs font-semibold">
-              {error}
-            </div>
-          )}
           <div>
             <label className="block text-sm font-semibold text-slate-700 mb-1.5">Email address</label>
             <input 
