@@ -1,7 +1,7 @@
 """
 AI Chat service for portfolio editing with multi-provider failover.
 
-Accepts a user message + current portfolio, sends to AI (Groq → Gemini → Anthropic),
+Accepts a user message + current portfolio, sends to Gemini AI,
 and returns the modified portfolio JSON + a human-readable reply.
 """
 
@@ -50,29 +50,19 @@ def _clean_json(text: str) -> str:
 
 # ─── Provider implementations ───────────────────────────────────────────────
 
-def _call_groq(system: str, prompt: str) -> str:
-    from groq import Groq
-
-    client = Groq(api_key=settings.GROQ_API_KEY)
-    response = client.chat.completions.create(
-        model="qwen/qwen3.8-27b",
-        messages=[
-            {"role": "system", "content": system},
-            {"role": "user", "content": prompt},
-        ],
-        temperature=0.3,
-        max_tokens=2048,
-    )
-    return response.choices[0].message.content
-
-
 def _call_gemini(system: str, prompt: str) -> str:
     from google import genai
+    from google.genai import types
 
     client = genai.Client(api_key=settings.GEMINI_API_KEY)
     response = client.models.generate_content(
         model="gemini-3.6-flash",
-        contents=f"{system}\n\n{prompt}",
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            system_instruction=system,
+            response_mime_type="application/json",
+            temperature=0.3,
+        )
     )
     return response.text
 
@@ -81,10 +71,8 @@ def _call_gemini(system: str, prompt: str) -> str:
 # ─── Provider registry ──────────────────────────────────────────────────────
 
 def _get_available_providers() -> List[Tuple[str, Callable]]:
-    """Return providers with configured API keys. Order: Groq → Gemini."""
+    """Return providers with configured API keys. Only Gemini is used."""
     providers = []
-    if settings.GROQ_API_KEY:
-        providers.append(("Groq", _call_groq))
     if settings.GEMINI_API_KEY:
         providers.append(("Gemini", _call_gemini))
     return providers
@@ -98,8 +86,7 @@ def process_chat(message: str, current_portfolio: Dict[str, Any], preferred_prov
     Args:
         message: The user's editing request (e.g., "Make my summary more impactful")
         current_portfolio: The current portfolio data as a dict
-        preferred_provider: Optional preferred provider name ("groq", "gemini", "anthropic").
-                           If set and available, it's tried first. Others are tried on failure.
+        preferred_provider: Optional preferred provider name (kept for backwards compatibility).
 
     Returns:
         Dict with keys: reply (str), updatedPortfolio (dict), provider (str)
@@ -108,7 +95,7 @@ def process_chat(message: str, current_portfolio: Dict[str, Any], preferred_prov
 
     if not all_providers:
         return {
-            "reply": "No AI providers are configured. Please add GROQ_API_KEY or GEMINI_API_KEY to your .env file.",
+            "reply": "No AI providers are configured. Please add GEMINI_API_KEY to your .env file.",
             "updatedPortfolio": current_portfolio,
             "provider": "none",
         }

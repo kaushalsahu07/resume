@@ -10,7 +10,7 @@ router = APIRouter()
 class ChatRequest(BaseModel):
     message: str
     currentPortfolio: Dict[str, Any]
-    provider: Optional[str] = None  # "groq", "gemini" — or None for auto
+    provider: Optional[str] = None  # "gemini" or None for auto
 
 
 class ChatResponse(BaseModel):

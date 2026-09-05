@@ -1,14 +1,13 @@
 """
 Multi-provider AI resume structurer with automatic failover.
 
-Tries providers in order: Groq → Gemini → Anthropic.
-If one fails (rate limit, quota, network error), it automatically falls through to the next.
+Uses Google Gemini API for extraction.
+If it fails (rate limit, quota, network error), it returns an empty portfolio.
 """
 
 import json
 from typing import Callable, List, Tuple
 
-from groq import Groq
 from google import genai
 
 from app.core.config import settings
@@ -60,27 +59,18 @@ def _parse_response(raw_text: str) -> ExtractedPortfolio:
 
 # ─── Provider implementations ───────────────────────────────────────────────
 
-def _call_groq(prompt: str) -> str:
-    """Call Groq (Llama 3) API."""
-    client = Groq(api_key=settings.GROQ_API_KEY)
-    response = client.chat.completions.create(
-        model="qwen/qwen3.8-27b",
-        messages=[
-            {"role": "system", "content": _SYSTEM},
-            {"role": "user", "content": prompt},
-        ],
-        temperature=0,
-        max_tokens=2048,
-    )
-    return response.choices[0].message.content
-
-
 def _call_gemini(prompt: str) -> str:
     """Call Google Gemini API."""
+    from google.genai import types
     client = genai.Client(api_key=settings.GEMINI_API_KEY)
     response = client.models.generate_content(
         model="gemini-3.6-flash",
-        contents=f"{_SYSTEM}\n\n{prompt}",
+        contents=prompt,
+        config=types.GenerateContentConfig(
+            system_instruction=_SYSTEM,
+            response_mime_type="application/json",
+            temperature=0.1,
+        )
     )
     return response.text
 
@@ -90,10 +80,8 @@ def _call_gemini(prompt: str) -> str:
 
 def _get_available_providers() -> List[Tuple[str, Callable]]:
     """Return list of (name, callable) for providers that have API keys configured.
-    Order: Groq (fastest) → Gemini (free tier)."""
+    Only Gemini is used currently."""
     providers = []
-    if settings.GROQ_API_KEY:
-        providers.append(("Groq", _call_groq))
     if settings.GEMINI_API_KEY:
         providers.append(("Gemini", _call_gemini))
     return providers
@@ -104,7 +92,7 @@ def _get_available_providers() -> List[Tuple[str, Callable]]:
 def structure_resume_text(raw_text: str) -> ExtractedPortfolio:
     """Parse resume text using AI with automatic failover across providers.
 
-    Tries each configured provider in order (Groq → Gemini → Anthropic).
+    Uses Gemini for extraction.
     If one fails for any reason (rate limit, quota, network error, invalid JSON),
     it automatically falls through to the next provider.
     Falls back to an empty portfolio if ALL providers fail.
@@ -112,7 +100,7 @@ def structure_resume_text(raw_text: str) -> ExtractedPortfolio:
     providers = _get_available_providers()
 
     if not providers:
-        print("Warning: No AI providers configured (GROQ_API_KEY, GEMINI_API_KEY are all empty). Returning empty portfolio.")
+        print("Warning: No AI providers configured (GEMINI_API_KEY is empty). Returning empty portfolio.")
         return ExtractedPortfolio()
 
     prompt = _build_prompt(raw_text)
