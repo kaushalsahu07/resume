@@ -14,7 +14,6 @@ export function getSubdomainFromHostname(hostname = window.location.hostname): s
     }
     
     const isPaas = hostname.endsWith('.onrender.com') || 
-                   hostname.endsWith('.vercel.app') || 
                    hostname.endsWith('.netlify.app') ||
                    hostname.endsWith('.pages.dev')
 
