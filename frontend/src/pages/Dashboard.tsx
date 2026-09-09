@@ -54,7 +54,6 @@ export default function Dashboard() {
   }
 
   const publishedCount = portfolios.filter(p => p.isPublished).length
-  const totalViews = portfolios.reduce((acc, p) => acc + (p.viewCount || 0), 0)
 
   if (loading) return (
     <div className="max-w-6xl w-full mx-auto p-4 sm:p-6 py-12">
@@ -95,7 +94,7 @@ export default function Dashboard() {
 
       {/* Metrics Row */}
       {portfolios.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10 opacity-0 animate-fade-in-up" style={{ animationDelay: '80ms' }}>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-10 opacity-0 animate-fade-in-up" style={{ animationDelay: '80ms' }}>
           <div className="glass-card bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Portfolios</span>
             <span className="text-2xl sm:text-3xl font-black text-slate-900 mt-1 block">{portfolios.length}</span>
@@ -103,10 +102,6 @@ export default function Dashboard() {
           <div className="glass-card bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Live Sites</span>
             <span className="text-2xl sm:text-3xl font-black text-emerald-600 mt-1 block">{publishedCount}</span>
-          </div>
-          <div className="glass-card bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all">
-            <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Total Views</span>
-            <span className="text-2xl sm:text-3xl font-black text-blue-600 mt-1 block">{totalViews}</span>
           </div>
           <div className="glass-card bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">AI Status</span>
@@ -208,10 +203,6 @@ export default function Dashboard() {
                 {/* Meta details */}
                 <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-6">
                   <span className="capitalize">{portfolio.templateId?.replace('-', ' ')}</span>
-                  <span>•</span>
-                  <span>{portfolio.experience?.length || 0} jobs</span>
-                  <span>•</span>
-                  <span>{portfolio.skills?.length || 0} skills</span>
                 </div>
               </div>
 
