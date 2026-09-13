@@ -1,9 +1,10 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useMemo } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import {
   ArrowLeft, Send, Eye, Edit3, ArrowUp, ArrowDown, Plus, Trash2,
   Bot, Sparkles, Check, ExternalLink,
-  Monitor, Smartphone, ChevronDown, ChevronUp, Wand2
+  Monitor, Smartphone, ChevronDown, ChevronUp, Wand2,
+  AlertTriangle, CheckCircle2, Loader2
 } from 'lucide-react'
 import type { Portfolio } from '../types/portfolio'
 import { apiClient } from '../lib/apiClient'
@@ -26,6 +27,18 @@ export default function Editor() {
   const [copied, setCopied] = useState(false)
   const [viewport, setViewport] = useState<'desktop' | 'mobile'>('desktop')
   const iframeRef = useRef<HTMLIFrameElement>(null)
+
+  // Slug availability checking
+  const [slugStatus, setSlugStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle')
+  const [isCheckingSlug, setIsCheckingSlug] = useState(false)
+
+  // Stable slug suggestion (only recomputes when slug changes, not every render)
+  const slugSuggestion = useMemo(() => {
+    if (!portfolio?.slug) return ''
+    const suffix = Math.floor(Math.random() * 900) + 100
+    return `${portfolio.slug}-${suffix}`
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [portfolio?.slug])
 
   // Desktop Preview Scaling
   const desktopContainerRef = useRef<HTMLDivElement>(null)
@@ -109,6 +122,45 @@ export default function Editor() {
     }, 1500)
     return () => clearTimeout(timer)
   }, [portfolio, portfolioId])
+
+  // Debounced slug availability check (500ms debounce)
+  useEffect(() => {
+    if (!portfolio?.slug || !portfolioId) {
+      setSlugStatus('idle')
+      return
+    }
+    // Don't check very short slugs
+    if (portfolio.slug.length < 2) {
+      setSlugStatus('idle')
+      return
+    }
+    setIsCheckingSlug(true)
+    setSlugStatus('checking')
+
+    const controller = new AbortController()
+    const timer = setTimeout(async () => {
+      try {
+        const res = await apiClient.request<{ available: boolean }>(
+          `/portfolios/check-slug?slug=${encodeURIComponent(portfolio.slug)}&exclude_portfolio_id=${portfolioId}`,
+          { signal: controller.signal }
+        )
+        setSlugStatus(res.available ? 'available' : 'taken')
+      } catch (err: any) {
+        // Ignore aborted requests
+        if (err?.name !== 'AbortError') {
+          setSlugStatus('idle')
+        }
+      } finally {
+        setIsCheckingSlug(false)
+      }
+    }, 500)
+
+    return () => {
+      clearTimeout(timer)
+      controller.abort()
+      setIsCheckingSlug(false)
+    }
+  }, [portfolio?.slug, portfolioId])
 
   if (!portfolio) {
     return (
@@ -250,6 +302,10 @@ export default function Editor() {
   const handlePublish = async () => {
     if (!portfolio.slug) {
       alert("Please enter a custom URL slug before publishing.")
+      return
+    }
+    if (slugStatus === 'taken') {
+      alert("This domain slug is already taken. Please choose a different one.")
       return
     }
     try {
@@ -1010,61 +1066,155 @@ export default function Editor() {
           }`}
       >
         {/* Preview Top Toolbar */}
-        <div className="p-3 sm:px-6 flex flex-wrap sm:flex-nowrap justify-center sm:justify-between items-center gap-3 sm:gap-0 shrink-0 bg-white/60 backdrop-blur-md border-b border-slate-200/70 z-30">
-          {/* Viewport switcher */}
-          <div className="flex items-center gap-1 bg-white/80 p-1 rounded-full border border-slate-200 shadow-2xs">
-            <button
-              onClick={() => setViewport('desktop')}
-              className={`p-1.5 rounded-full transition-all ${viewport === 'desktop' ? 'bg-slate-950 text-white' : 'text-slate-500 hover:text-slate-900'
-                }`}
-              title="Desktop View"
-            >
-              <Monitor className="w-3.5 h-3.5" />
-            </button>
-            <button
-              onClick={() => setViewport('mobile')}
-              className={`p-1.5 rounded-full transition-all ${viewport === 'mobile' ? 'bg-slate-950 text-white' : 'text-slate-500 hover:text-slate-900'
-                }`}
-              title="Mobile View"
-            >
-              <Smartphone className="w-3.5 h-3.5" />
-            </button>
-          </div>
-
-          {/* Custom Domain Slug input */}
-          <div className="flex items-center gap-1 bg-white/90 border border-slate-200 rounded-full px-2 sm:px-3 py-1 text-[11px] sm:text-xs shadow-2xs">
-            <span className="text-slate-400 font-medium hidden sm:inline">https://</span>
-            <input
-              type="text"
-              className="bg-transparent text-slate-900 font-bold outline-none w-[70px] sm:w-[130px] text-[11px] sm:text-xs text-right sm:text-left"
-              value={portfolio.slug || ''}
-              onChange={e => handleUpdate({ slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') })}
-              placeholder="yourname"
-            />
-            <span className="text-slate-500 font-medium">.portfolyo.works</span>
-          </div>
-
-          {/* Publish & Share button */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handlePublish}
-              className="flex items-center gap-1.5 bg-slate-950 hover:bg-slate-800 text-white px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold shadow-sm transition-all hover:scale-105 active:scale-95 whitespace-nowrap"
-            >
-              {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Send className="w-3.5 h-3.5" />}
-              <span>{copied ? 'Copied!' : portfolio.isPublished ? 'Update & Copy' : 'Publish Live'}</span>
-            </button>
-            {portfolio.isPublished && (
-              <a
-                href={getPortfolioPublicUrl(portfolio.slug)}
-                target="_blank"
-                rel="noreferrer"
-                className="p-1.5 rounded-full bg-white border border-slate-200 text-slate-700 hover:text-black hover:bg-slate-50 transition-colors shadow-2xs shrink-0"
-                title={`Open live portfolio (${getPortfolioPublicUrl(portfolio.slug)})`}
+        <div className="shrink-0 z-30">
+          {/* Main toolbar row */}
+          <div className="p-3 sm:px-6 flex flex-wrap sm:flex-nowrap justify-center sm:justify-between items-center gap-3 sm:gap-0 bg-white/60 backdrop-blur-md border-b border-slate-200/70">
+            {/* Viewport switcher */}
+            <div className="flex items-center gap-1 bg-white/80 p-1 rounded-full border border-slate-200 shadow-2xs">
+              <button
+                onClick={() => setViewport('desktop')}
+                className={`p-1.5 rounded-full transition-all ${viewport === 'desktop' ? 'bg-slate-950 text-white' : 'text-slate-500 hover:text-slate-900'
+                  }`}
+                title="Desktop View"
               >
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            )}
+                <Monitor className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => setViewport('mobile')}
+                className={`p-1.5 rounded-full transition-all ${viewport === 'mobile' ? 'bg-slate-950 text-white' : 'text-slate-500 hover:text-slate-900'
+                  }`}
+                title="Mobile View"
+              >
+                <Smartphone className="w-3.5 h-3.5" />
+              </button>
+            </div>
+
+            {/* Custom Domain Slug input */}
+            <div className={`flex items-center gap-1 border rounded-full px-2 sm:px-3 py-1 text-[11px] sm:text-xs shadow-2xs transition-all duration-300 ${
+              slugStatus === 'taken'
+                ? 'bg-red-50/90 border-red-300 ring-2 ring-red-200/50'
+                : slugStatus === 'available'
+                  ? 'bg-emerald-50/60 border-emerald-300 ring-2 ring-emerald-200/40'
+                  : 'bg-white/90 border-slate-200'
+            }`}>
+              <span className="text-slate-400 font-medium hidden sm:inline">https://</span>
+              <input
+                type="text"
+                className="bg-transparent text-slate-900 font-bold outline-none w-[70px] sm:w-[130px] text-[11px] sm:text-xs text-right sm:text-left"
+                value={portfolio.slug || ''}
+                onChange={e => handleUpdate({ slug: e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, '-') })}
+                placeholder="yourname"
+              />
+              <span className="text-slate-500 font-medium">.portfolyo.works</span>
+              {slugStatus === 'checking' && (
+                <Loader2 className="w-3.5 h-3.5 text-slate-400 animate-spin ml-1 shrink-0" />
+              )}
+              {slugStatus === 'taken' && (
+                <div className="w-4 h-4 rounded-full bg-red-100 flex items-center justify-center ml-1 shrink-0">
+                  <AlertTriangle className="w-2.5 h-2.5 text-red-500" />
+                </div>
+              )}
+              {slugStatus === 'available' && (
+                <div className="w-4 h-4 rounded-full bg-emerald-100 flex items-center justify-center ml-1 shrink-0">
+                  <CheckCircle2 className="w-2.5 h-2.5 text-emerald-600" />
+                </div>
+              )}
+            </div>
+
+            {/* Publish & Share button */}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={handlePublish}
+                disabled={slugStatus === 'taken'}
+                className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold shadow-sm transition-all whitespace-nowrap ${
+                  slugStatus === 'taken'
+                    ? 'bg-slate-300 text-slate-500 cursor-not-allowed'
+                    : 'bg-slate-950 hover:bg-slate-800 text-white hover:scale-105 active:scale-95'
+                }`}
+              >
+                {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Send className="w-3.5 h-3.5" />}
+                <span>{copied ? 'Copied!' : portfolio.isPublished ? 'Update & Copy' : 'Publish Live'}</span>
+              </button>
+              {portfolio.isPublished && (
+                <a
+                  href={getPortfolioPublicUrl(portfolio.slug)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="p-1.5 rounded-full bg-white border border-slate-200 text-slate-700 hover:text-black hover:bg-slate-50 transition-colors shadow-2xs shrink-0"
+                  title={`Open live portfolio (${getPortfolioPublicUrl(portfolio.slug)})`}
+                >
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              )}
+            </div>
           </div>
+
+          {/* Domain taken warning banner — slides in below toolbar */}
+          {slugStatus === 'taken' && (
+            <div
+              className="slug-warning-banner mx-3 sm:mx-6 mt-2 mb-1"
+              style={{ animation: 'slideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1)' }}
+            >
+              <div className="relative overflow-hidden rounded-2xl border border-red-200 bg-gradient-to-r from-red-50 via-amber-50/60 to-orange-50 shadow-lg shadow-red-100/40">
+                {/* Decorative shimmer bar */}
+                <div className="absolute top-0 left-0 right-0 h-[3px] bg-gradient-to-r from-red-400 via-amber-400 to-orange-400 rounded-t-2xl" />
+                
+                <div className="flex items-start gap-3 p-3.5 sm:p-4 pt-5">
+                  {/* Pulsing warning icon */}
+                  <div className="relative shrink-0 mt-0.5">
+                    <div className="absolute inset-0 bg-red-400/20 rounded-xl animate-ping" style={{ animationDuration: '2s' }} />
+                    <div className="relative w-9 h-9 rounded-xl bg-gradient-to-br from-red-500 to-amber-500 flex items-center justify-center shadow-md shadow-red-200/50">
+                      <AlertTriangle className="w-4.5 h-4.5 text-white" strokeWidth={2.5} />
+                    </div>
+                  </div>
+
+                  {/* Warning content */}
+                  <div className="flex-1 min-w-0">
+                    <p className="text-[13px] sm:text-sm font-bold text-red-900 leading-tight">
+                      Domain unavailable
+                    </p>
+                    <p className="text-[11px] sm:text-xs text-red-700/80 mt-0.5 leading-relaxed">
+                      <span className="font-semibold text-red-800">{portfolio.slug}.portfolyo.works</span>{' '}
+                      is already claimed by another user. Choose a unique slug to publish.
+                    </p>
+                    {/* Suggestion */}
+                    <button
+                      type="button"
+                      className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/80 hover:bg-white border border-red-200/70 text-[11px] font-semibold text-slate-700 hover:text-slate-900 transition-all hover:shadow-sm active:scale-[0.97]"
+                      onClick={() => handleUpdate({ slug: slugSuggestion })}
+                    >
+                      <Sparkles className="w-3 h-3 text-amber-500" />
+                      Try "{slugSuggestion}" instead
+                    </button>
+                  </div>
+
+                  {/* Dismiss / close context */}
+                  <div className="shrink-0">
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-100/80 text-[10px] font-bold text-red-600 uppercase tracking-wide">
+                      Taken
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Domain available confirmation — subtle inline */}
+          {slugStatus === 'available' && portfolio.slug && portfolio.slug.length >= 2 && (
+            <div
+              className="mx-3 sm:mx-6 mt-2 mb-1"
+              style={{ animation: 'slideDown 0.25s cubic-bezier(0.16, 1, 0.3, 1)' }}
+            >
+              <div className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-50/80 border border-emerald-200/60">
+                <div className="w-6 h-6 rounded-lg bg-emerald-500 flex items-center justify-center shadow-sm shadow-emerald-200/50">
+                  <CheckCircle2 className="w-3.5 h-3.5 text-white" />
+                </div>
+                <p className="text-[11px] sm:text-xs font-semibold text-emerald-800">
+                  <span className="font-bold">{portfolio.slug}.portfolyo.works</span> is available — you're good to go!
+                </p>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Live Template Container */}

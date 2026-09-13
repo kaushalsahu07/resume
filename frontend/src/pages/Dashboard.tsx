@@ -7,11 +7,14 @@ import { useState, useEffect } from 'react'
 import { apiClient } from '../lib/apiClient'
 import { getPortfolioPublicUrl } from '../lib/portfolioUrl'
 import type { Portfolio } from '../types/portfolio'
+import { useSEO } from '../hooks/useSEO'
 
 export default function Dashboard() {
   const [portfolios, setPortfolios] = useState<Portfolio[]>([])
   const [loading, setLoading] = useState(true)
   const [copiedId, setCopiedId] = useState<string | null>(null)
+
+  useSEO({ title: 'Dashboard', noIndex: true })
 
   useEffect(() => {
     const fetchPortfolios = async () => {

@@ -7,6 +7,7 @@ import {
   Cpu, ArrowUpRight
 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
+import { useSEO } from '../hooks/useSEO'
 import { getTemplateById } from '../components/templates'
 import { mockPortfolio } from './Demo'
 
@@ -21,6 +22,12 @@ export default function Landing() {
   const { user, logout } = useAuth()
   const [activePreviewTemplate, setActivePreviewTemplate] = useState<string>('cosmic-violet')
   const [openFaq, setOpenFaq] = useState<number | null>(0)
+
+  useSEO({
+    title: 'Turn Your Resume into a Stunning Portfolio in Seconds',
+    description: 'Upload your resume (PDF or DOCX) and let AI instantly generate a beautiful, interactive portfolio website. Choose from 8+ designer templates, customize everything, and publish with a shareable link. No coding required.',
+    canonicalUrl: 'https://portfolyo.works/',
+  })
 
   const toggleFaq = (index: number) => {
     setOpenFaq(openFaq === index ? null : index)

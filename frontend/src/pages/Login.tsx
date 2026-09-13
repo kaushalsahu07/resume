@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Sparkles, ArrowRight } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
+import { useSEO } from '../hooks/useSEO'
 
 export default function Login() {
   const [email, setEmail] = useState('')
@@ -9,6 +10,8 @@ export default function Login() {
   const [error, setError] = useState('')
   const { login } = useAuth()
   const navigate = useNavigate()
+
+  useSEO({ title: 'Log In', noIndex: true })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

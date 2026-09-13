@@ -1,9 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useMemo } from 'react'
 import { useParams, Link } from 'react-router-dom'
 import { apiClient } from '../lib/apiClient'
 import type { Portfolio } from '../types/portfolio'
 import { getTemplateById } from '../components/templates'
 import { Sparkles, ArrowRight } from 'lucide-react'
+import { useSEO, buildPortfolioJsonLd } from '../hooks/useSEO'
 
 export function getSubdomainFromHostname(hostname = window.location.hostname): string | null {
   const parts = hostname.split('.')
@@ -52,6 +53,28 @@ export default function PublicPortfolio({ subdomainSlug }: { subdomainSlug?: str
     }
     fetchPortfolio()
   }, [slug])
+
+  // Build JSON-LD structured data for this portfolio
+  const jsonLd = useMemo(() => {
+    if (!portfolio) return undefined
+    return buildPortfolioJsonLd({
+      slug: slug || '',
+      headline: portfolio.headline,
+      summary: portfolio.summary,
+      experience: portfolio.experience,
+      education: portfolio.education,
+      skills: portfolio.skills,
+      links: portfolio.links,
+    })
+  }, [portfolio, slug])
+
+  useSEO({
+    title: portfolio?.headline || `${slug}'s Portfolio`,
+    description: portfolio?.summary || `Professional portfolio of ${slug} — built with PortfoliAI`,
+    canonicalUrl: `https://portfolyo.works/p/${slug}`,
+    ogType: 'profile',
+    jsonLd,
+  })
 
   if (loading) {
     return (

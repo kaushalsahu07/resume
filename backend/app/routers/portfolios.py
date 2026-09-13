@@ -9,6 +9,33 @@ from pydantic import BaseModel
 router = APIRouter()
 
 
+# ─── Slug Availability Check ─────────────────────────────────────────────────
+
+from fastapi import Query
+from typing import Optional
+
+@router.get("/check-slug")
+def check_slug_availability(
+    slug: str = Query(..., min_length=1),
+    exclude_portfolio_id: Optional[str] = Query(None),
+):
+    """Check if a portfolio slug is already taken by another user.
+    Returns { available: bool } — lightweight, no auth required for the check itself."""
+    if not slug or not slug.strip():
+        return {"available": False, "reason": "Slug cannot be empty"}
+
+    try:
+        query = supabase_admin.table("portfolios").select("id").eq("slug", slug)
+        if exclude_portfolio_id:
+            query = query.neq("id", exclude_portfolio_id)
+        res = query.execute()
+        taken = bool(res.data and len(res.data) > 0)
+        return {"available": not taken}
+    except Exception as e:
+        print("check_slug error:", e)
+        return {"available": True}  # fail-open to not block UX
+
+
 def get_user_supabase(authorization: str = Header(...)) -> Client:
     """Create a per-request Supabase client authenticated as the current user.
     This makes RLS policies apply correctly for every request."""
@@ -53,7 +80,7 @@ def get_portfolio(portfolio_id: str, client: Client = Depends(get_user_supabase)
     except Exception as e:
         raise HTTPException(status_code=404, detail="Portfolio not found")
 
-    if not res.data:
+    if not res.data or not isinstance(res.data, dict):
         raise HTTPException(status_code=404, detail="Portfolio not found")
         
     portfolio = Portfolio(**res.data)

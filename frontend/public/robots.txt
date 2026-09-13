@@ -1,0 +1,61 @@
+# PortfoliAI — robots.txt
+# Allow all crawlers including AI bots for maximum discoverability
+
+User-agent: *
+Allow: /
+
+# Public portfolio pages — high priority for indexing
+Allow: /p/
+
+# Static assets
+Allow: /favicon.ico
+
+# Disallow private/app areas
+Disallow: /dashboard
+Disallow: /upload
+Disallow: /editor/
+Disallow: /account
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /update-password
+Disallow: /live-preview
+
+# ─── AI Bot-Specific Rules ────────────────────────────────────
+# Explicitly allow major AI crawlers for AI search result visibility
+
+User-agent: GPTBot
+Allow: /
+Allow: /p/
+
+User-agent: Google-Extended
+Allow: /
+Allow: /p/
+
+User-agent: ChatGPT-User
+Allow: /
+Allow: /p/
+
+User-agent: Anthropic-AI
+Allow: /
+Allow: /p/
+
+User-agent: ClaudeBot
+Allow: /
+Allow: /p/
+
+User-agent: PerplexityBot
+Allow: /
+Allow: /p/
+
+User-agent: Bingbot
+Allow: /
+Allow: /p/
+
+User-agent: Googlebot
+Allow: /
+Allow: /p/
+
+# ─── Sitemaps ─────────────────────────────────────────────────
+Sitemap: https://portfolyo.works/sitemap.xml
+Sitemap: https://portfolyo.works/api/sitemap.xml

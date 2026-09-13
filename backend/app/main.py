@@ -3,7 +3,7 @@ from fastapi import FastAPI
 # pyrefly: ignore [missing-import]
 from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
-from app.routers import auth, resume, portfolios, public, chat
+from app.routers import auth, resume, portfolios, public, chat, seo
 
 app = FastAPI(title="Resume-to-Portfolio API")
 
@@ -21,6 +21,7 @@ app.include_router(resume.router, prefix="/resume", tags=["Resume"])
 app.include_router(portfolios.router, prefix="/portfolios", tags=["Portfolios"])
 app.include_router(public.router, prefix="/p", tags=["Public"])
 app.include_router(chat.router, prefix="/portfolios", tags=["AI Chat"])
+app.include_router(seo.router, tags=["SEO"])
 
 @app.get("/health")
 def health_check():

@@ -1,1 +1,7 @@
+# SEO files — serve directly, don't redirect to SPA
+/robots.txt    /robots.txt    200
+/llms.txt      /llms.txt      200
+/sitemap.xml   https://resume-v7br.onrender.com/sitemap.xml   200
+
+# SPA fallback — everything else goes to index.html
 /*    /index.html   200

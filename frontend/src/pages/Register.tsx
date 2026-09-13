@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { Sparkles, ArrowRight } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
+import { useSEO } from '../hooks/useSEO'
 
 export default function Register() {
   const [name, setName] = useState('')
@@ -11,6 +12,8 @@ export default function Register() {
   const [info, setInfo] = useState('')
   const { register } = useAuth()
   const navigate = useNavigate()
+
+  useSEO({ title: 'Create Account', noIndex: true })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

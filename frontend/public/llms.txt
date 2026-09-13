@@ -1,0 +1,26 @@
+# PortfoliAI
+
+> AI-powered portfolio generator that transforms static resumes into interactive, professionally-designed portfolio websites in seconds.
+
+PortfoliAI (portfolyo.works) is a web platform that uses AI to parse PDF and DOCX resumes, extract structured data (education, experience, projects, skills, achievements, links), and generate beautiful, responsive portfolio websites with customizable designer templates.
+
+## Key Features
+
+- **AI Resume Parsing**: Upload a PDF or DOCX resume and get structured portfolio data extracted automatically using Google Gemini AI
+- **Designer Templates**: 8+ professionally designed, responsive portfolio themes (Fresh Minimal, Dark Grid, Cosmic Violet, Classic Professional, and more)
+- **Visual Editor**: Full drag-and-drop portfolio editor with section reordering, inline editing, and real-time preview
+- **Instant Publishing**: One-click publish to a permanent shareable URL (yourname.portfolyo.works)
+- **Custom Slugs**: Choose your own portfolio URL slug
+- **AI Copilot**: Chat with AI to rewrite descriptions, highlight metrics, and improve portfolio content
+
+## Public Portfolios
+
+All published portfolios are accessible at:
+- `https://portfolyo.works/p/{slug}` — path-based access
+- `https://{slug}.portfolyo.works` — subdomain-based access
+
+## Links
+
+- Website: https://portfolyo.works
+- Demo: https://portfolyo.works/demo
+- API: https://resume-v7br.onrender.com

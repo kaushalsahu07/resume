@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom'
 import { ArrowLeft, ArrowRight, Wand2 } from 'lucide-react'
 import { templates, getTemplateById } from '../components/templates'
 import type { Portfolio } from '../types/portfolio'
+import { useSEO } from '../hooks/useSEO'
 
 export const mockPortfolio: Portfolio = {
   id: 'demo-1',
@@ -45,6 +46,12 @@ export const mockPortfolio: Portfolio = {
 
 export default function Demo() {
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('dark-grid')
+
+  useSEO({
+    title: 'Live Demo — Preview Portfolio Templates',
+    description: 'Explore PortfoliAI\'s designer portfolio templates with a live interactive demo. See how your resume transforms into a beautiful website.',
+    canonicalUrl: 'https://portfolyo.works/demo',
+  })
 
   const ActiveTemplateComponent = getTemplateById(selectedTemplateId).component
 
