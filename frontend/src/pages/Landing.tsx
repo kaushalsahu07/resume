@@ -10,6 +10,7 @@ import { useAuth } from '../hooks/useAuth'
 import { useSEO } from '../hooks/useSEO'
 import { getTemplateById } from '../components/templates'
 import { mockPortfolio } from './Demo'
+import { sanitizePortfolioLinks } from '../lib/portfolioUrl'
 
 const PREVIEW_TEMPLATES = [
   { id: 'fresh-minimal', name: 'Fresh Minimal' },
@@ -234,7 +235,7 @@ export default function Landing() {
                       return (
                         <TemplateComponent
                           key={activePreviewTemplate}
-                          portfolio={{ ...mockPortfolio, templateId: activePreviewTemplate }}
+                          portfolio={sanitizePortfolioLinks({ ...mockPortfolio, templateId: activePreviewTemplate })}
                         />
                       )
                     })()}
@@ -254,7 +255,7 @@ export default function Landing() {
                         return (
                           <TemplateComponent
                             key={activePreviewTemplate}
-                            portfolio={{ ...mockPortfolio, templateId: activePreviewTemplate }}
+                            portfolio={sanitizePortfolioLinks({ ...mockPortfolio, templateId: activePreviewTemplate })}
                           />
                         )
                       })()}

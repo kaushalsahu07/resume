@@ -24,3 +24,17 @@ export function getPortfolioPublicUrl(slug: string): string {
   const baseDomain = rootDomain || 'portfolyo.works'
   return `${protocol}//${slug}.${baseDomain}${port}`
 }
+
+export function sanitizePortfolioLinks(portfolio: any) {
+  if (!portfolio || !portfolio.links) return portfolio;
+  return {
+    ...portfolio,
+    links: portfolio.links.map((link: any) => {
+      let url = link.url || '';
+      if (url && !url.startsWith('http://') && !url.startsWith('https://') && !url.startsWith('mailto:')) {
+        url = 'https://' + url;
+      }
+      return { ...link, url };
+    })
+  };
+}

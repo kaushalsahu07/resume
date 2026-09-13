@@ -1,4 +1,5 @@
 import type { Portfolio } from '../../types/portfolio'
+import { SocialIcon } from '../common/SocialIcon'
 
 export default function EmeraldEditorialTemplate({ portfolio }: { portfolio: Portfolio }) {
   const name = portfolio.headline || 'Rosie'
@@ -273,15 +274,22 @@ export default function EmeraldEditorialTemplate({ portfolio }: { portfolio: Por
                       href={link.url}
                       target="_blank"
                       rel="noreferrer"
-                      className="inline-flex items-center justify-center rounded-full border border-[#f0c9d8] bg-white/50 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#1b1b1b]"
+                      className="inline-flex items-center gap-1.5 justify-center rounded-full border border-[#f0c9d8] bg-white/50 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#1b1b1b]"
                     >
+                      <SocialIcon url={link.url} label={link.label} className="w-3.5 h-3.5" />
                       {link.label}
                     </a>
                   ))
                 ) : (
                   <>
-                    <a href="https://github.com" target="_blank" rel="noreferrer" className="rounded-full border border-[#f0c9d8] bg-white/50 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#1b1b1b]">GitHub</a>
-                    <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="rounded-full border border-[#f0c9d8] bg-white/50 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#1b1b1b]">LinkedIn</a>
+                    <a href="https://github.com" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-[#f0c9d8] bg-white/50 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#1b1b1b]">
+                      <SocialIcon url="https://github.com" label="GitHub" className="w-3.5 h-3.5" />
+                      GitHub
+                    </a>
+                    <a href="https://linkedin.com" target="_blank" rel="noreferrer" className="inline-flex items-center gap-1.5 rounded-full border border-[#f0c9d8] bg-white/50 px-3 py-2 text-[10px] font-semibold uppercase tracking-[0.12em] text-[#1b1b1b]">
+                      <SocialIcon url="https://linkedin.com" label="LinkedIn" className="w-3.5 h-3.5" />
+                      LinkedIn
+                    </a>
                   </>
                 )}
               </div>

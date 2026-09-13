@@ -5,6 +5,7 @@ import type { Portfolio } from '../types/portfolio'
 import { getTemplateById } from '../components/templates'
 import { Sparkles, ArrowRight } from 'lucide-react'
 import { useSEO, buildPortfolioJsonLd } from '../hooks/useSEO'
+import { sanitizePortfolioLinks } from '../lib/portfolioUrl'
 
 export function getSubdomainFromHostname(hostname = window.location.hostname): string | null {
   const parts = hostname.split('.')
@@ -116,20 +117,22 @@ export default function PublicPortfolio({ subdomainSlug }: { subdomainSlug?: str
   return (
     <div className="min-h-screen relative">
       {TemplateComponent ? (
-        <TemplateComponent portfolio={portfolio} />
+        <TemplateComponent portfolio={sanitizePortfolioLinks(portfolio)} />
       ) : (
         <div className="p-8 text-center text-red-500">Template not found</div>
       )}
 
       {/* Floating PortfoliAI badge */}
       <div className="fixed bottom-5 right-5 z-40">
-        <Link
-          to="/"
+        <a
+          href="https://portfolyo.works"
+          target="_blank"
+          rel="noopener noreferrer"
           className="flex items-center gap-2 bg-slate-950/90 hover:bg-slate-950 text-white px-3.5 py-1.5 rounded-full text-xs font-semibold backdrop-blur-md shadow-xl border border-white/10 hover:scale-105 transition-all group"
         >
           <Sparkles className="w-3.5 h-3.5 text-blue-400 group-hover:rotate-12 transition-transform" />
           <span>Made with PortfoliAI</span>
-        </Link>
+        </a>
       </div>
     </div>
   )

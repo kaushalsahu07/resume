@@ -4,6 +4,7 @@ import { ArrowLeft, ArrowRight, Wand2 } from 'lucide-react'
 import { templates, getTemplateById } from '../components/templates'
 import type { Portfolio } from '../types/portfolio'
 import { useSEO } from '../hooks/useSEO'
+import { sanitizePortfolioLinks } from '../lib/portfolioUrl'
 
 export const mockPortfolio: Portfolio = {
   id: 'demo-1',
@@ -97,7 +98,7 @@ export default function Demo() {
 
       {/* Full Width Natural Responsive Template View */}
       <main className="flex-1 w-full">
-        <ActiveTemplateComponent portfolio={{ ...mockPortfolio, templateId: selectedTemplateId }} />
+        <ActiveTemplateComponent portfolio={sanitizePortfolioLinks({ ...mockPortfolio, templateId: selectedTemplateId })} />
       </main>
     </div>
   )

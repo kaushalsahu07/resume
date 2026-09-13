@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { getTemplateById } from '../components/templates'
 import type { Portfolio } from '../types/portfolio'
+import { sanitizePortfolioLinks } from '../lib/portfolioUrl'
 
 export default function LivePreview() {
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null)
@@ -36,5 +37,5 @@ export default function LivePreview() {
   const activeTemplateId = portfolio.templateId || (portfolio as any).template_id || 'dark-grid'
   const Template = getTemplateById(activeTemplateId).component
 
-  return <Template portfolio={portfolio} />
+  return <Template portfolio={sanitizePortfolioLinks(portfolio)} />
 }

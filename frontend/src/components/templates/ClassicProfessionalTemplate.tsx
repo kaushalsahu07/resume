@@ -1,4 +1,5 @@
 import type { Portfolio } from '../../types/portfolio'
+import { SocialIcon } from '../common/SocialIcon'
 
 export default function ClassicProfessionalTemplate({ portfolio }: { portfolio: Portfolio }) {
   return (
@@ -16,7 +17,8 @@ export default function ClassicProfessionalTemplate({ portfolio }: { portfolio: 
         {portfolio.links?.length > 0 && (
           <div className="flex flex-wrap gap-3 text-xs sm:text-sm font-medium">
             {portfolio.links.map(link => (
-              <a key={link.id} href={link.url} target="_blank" rel="noreferrer" className="text-primary hover:underline">
+              <a key={link.id} href={link.url} target="_blank" rel="noreferrer" className="text-primary hover:underline flex items-center gap-1.5">
+                <SocialIcon url={link.url} label={link.label} className="w-3.5 h-3.5" />
                 {link.label}
               </a>
             ))}

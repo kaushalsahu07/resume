@@ -1,4 +1,5 @@
 import type { Portfolio } from '../../types/portfolio'
+import { SocialIcon } from '../common/SocialIcon'
 
 export default function AlexEditorialTemplate({ portfolio }: { portfolio: Portfolio }) {
   const name = portfolio.headline || 'Alex Chen'
@@ -325,8 +326,9 @@ export default function AlexEditorialTemplate({ portfolio }: { portfolio: Portfo
                           href={link.url}
                           target="_blank"
                           rel="noreferrer"
-                          className="px-4 py-3 border border-[#00ff41] text-[#00ff41] font-mono text-xs font-bold uppercase tracking-widest hover:bg-[#00ff41]/10 transition"
+                          className="px-4 py-3 border border-[#00ff41] text-[#00ff41] font-mono text-xs font-bold uppercase tracking-widest hover:bg-[#00ff41]/10 transition flex items-center gap-2"
                         >
+                          <SocialIcon url={link.url} label={link.label} className="w-4 h-4" />
                           {link.label}
                         </a>
                       ))}

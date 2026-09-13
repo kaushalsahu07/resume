@@ -1,5 +1,6 @@
 import type { Portfolio } from '../../types/portfolio'
 import { ExternalLink } from 'lucide-react'
+import { SocialIcon } from '../common/SocialIcon'
 
 export default function FreshMinimalTemplate({ portfolio }: { portfolio: Portfolio }) {
   return (
@@ -25,8 +26,8 @@ export default function FreshMinimalTemplate({ portfolio }: { portfolio: Portfol
                   rel="noreferrer"
                   className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold bg-slate-100 hover:bg-slate-950 hover:text-white transition-all duration-200"
                 >
+                  <SocialIcon url={link.url} label={link.label} className="w-3 h-3" />
                   <span>{link.label}</span>
-                  <ExternalLink className="w-3 h-3" />
                 </a>
               ))}
             </div>
