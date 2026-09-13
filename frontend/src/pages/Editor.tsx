@@ -30,7 +30,6 @@ export default function Editor() {
 
   // Slug availability checking
   const [slugStatus, setSlugStatus] = useState<'idle' | 'checking' | 'available' | 'taken'>('idle')
-  const [isCheckingSlug, setIsCheckingSlug] = useState(false)
 
   // Stable slug suggestion (only recomputes when slug changes, not every render)
   const slugSuggestion = useMemo(() => {
@@ -134,7 +133,6 @@ export default function Editor() {
       setSlugStatus('idle')
       return
     }
-    setIsCheckingSlug(true)
     setSlugStatus('checking')
 
     const controller = new AbortController()
@@ -151,14 +149,13 @@ export default function Editor() {
           setSlugStatus('idle')
         }
       } finally {
-        setIsCheckingSlug(false)
+        // cleanup if needed
       }
     }, 500)
 
     return () => {
       clearTimeout(timer)
       controller.abort()
-      setIsCheckingSlug(false)
     }
   }, [portfolio?.slug, portfolioId])
 

@@ -59,8 +59,8 @@ export default function PublicPortfolio({ subdomainSlug }: { subdomainSlug?: str
     if (!portfolio) return undefined
     return buildPortfolioJsonLd({
       slug: slug || '',
-      headline: portfolio.headline,
-      summary: portfolio.summary,
+      headline: portfolio.headline || undefined,
+      summary: portfolio.summary || undefined,
       experience: portfolio.experience,
       education: portfolio.education,
       skills: portfolio.skills,
