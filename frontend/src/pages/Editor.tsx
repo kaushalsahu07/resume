@@ -25,7 +25,7 @@ export default function Editor() {
   const [remainingRequests, setRemainingRequests] = useState(1000)
   const [isChatLoading, setIsChatLoading] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [viewport, setViewport] = useState<'desktop' | 'mobile'>('desktop')
+  const [viewport, setViewport] = useState<'desktop' | 'mobile'>('mobile')
   const iframeRef = useRef<HTMLIFrameElement>(null)
 
   // Slug availability checking
@@ -376,8 +376,7 @@ export default function Editor() {
     "🪄 Rewrite summary to sound more impactful",
     "🎨 Switch to Dark Grid theme",
     "🎨 Switch to Fresh Minimal theme",
-    "💼 Polish experience bullet points with metrics",
-    "➕ Add Python and AWS to skills"
+    "💼 Polish experience bullet points with metrics"
   ]
 
   return (
