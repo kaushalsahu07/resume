@@ -4,8 +4,6 @@ import {
   GraduationCap,
   Award,
   ExternalLink,
-  Mail,
-  Globe,
   Code2,
   Menu,
   X,

@@ -6,7 +6,6 @@ import {
   Award,
   ExternalLink,
   Mail,
-  Globe,
   ArrowRight,
   Terminal,
   Layers,
