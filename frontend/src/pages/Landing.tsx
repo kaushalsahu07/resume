@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 import {
   FileUp, Sparkles, ArrowRight, Eye, LogOut,
   CheckCircle2, Zap, Shield, Globe, ChevronDown,
-  Smartphone, Palette, Wand2, Star, Check,
+  Smartphone, Palette, Wand2, Check,
   Cpu, ArrowUpRight
 } from 'lucide-react'
 import { useAuth } from '../hooks/useAuth'
@@ -16,7 +16,7 @@ const PREVIEW_TEMPLATES = [
   { id: 'fresh-minimal', name: 'Fresh Minimal' },
   { id: 'dark-grid', name: 'Dark Grid' },
   { id: 'cosmic-violet', name: 'Cosmic Violet' },
-  { id: 'classic-professional', name: 'Classic Pro' }
+  { id: 'classic-professional', name: 'Classic Professional' }
 ]
 
 export default function Landing() {
@@ -26,7 +26,7 @@ export default function Landing() {
 
   useSEO({
     title: 'Turn Your Resume into a Stunning Portfolio in Seconds',
-    description: 'Upload your resume (PDF or DOCX) and let AI instantly generate a beautiful, interactive portfolio website. Choose from 8+ designer templates, customize everything, and publish with a shareable link. No coding required.',
+    description: 'Upload your resume (PDF or DOCX) and let AI instantly generate a beautiful, interactive portfolio website. Choose from 4 designer templates, customize everything, and publish with a shareable link. No coding required.',
     canonicalUrl: 'https://portfolyo.works/',
   })
 
@@ -37,11 +37,11 @@ export default function Landing() {
   const faqs = [
     {
       q: "What file formats can I upload?",
-      a: "PortfoliAI supports standard PDF (.pdf) and Microsoft Word (.docx) resumes up to 10MB. Our AI parses single and multi-column formats with 99.4% structural accuracy."
+      a: "PortfoliAI supports standard PDF (.pdf) and Microsoft Word (.docx) resumes up to 10MB. Our AI accurately parses single and multi-column formats to preserve your content."
     },
     {
       q: "Can I customize the generated portfolio?",
-      a: "Yes! You can choose between 8+ designer themes, edit any text or project manually in our visual studio, or ask the AI Copilot to rewrite descriptions, highlight metrics, or reorder sections."
+      a: "Yes! You can choose between 4 designer themes, edit any text or project manually in our visual studio, or ask the AI Copilot to rewrite descriptions, highlight metrics, or reorder sections."
     },
     {
       q: "Do I need any coding or web hosting knowledge?",
@@ -154,23 +154,26 @@ export default function Landing() {
           </p>
 
           {/* Primary CTA Buttons */}
-          <div className="mt-8 sm:mt-10 flex flex-col sm:flex-row gap-3 sm:gap-3.5 items-center justify-center w-full sm:w-auto">
-            <Link
-              to="/upload"
-              className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 sm:gap-3 bg-slate-950 hover:bg-slate-800 text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-full font-bold text-sm sm:text-base shadow-xl shadow-slate-950/20 hover:shadow-2xl hover:shadow-slate-950/30 hover:-translate-y-1 active:translate-y-0 active:scale-[0.98] transition-all duration-200"
-            >
-              <FileUp className="w-4 sm:w-5 h-4 sm:h-5 stroke-[2.2] group-hover:scale-110 transition-transform" />
-              <span>Upload Your Resume</span>
-              <ArrowRight className="w-3.5 sm:w-4 h-3.5 sm:h-4 stroke-[2.2] group-hover:translate-x-1.5 transition-transform duration-200" />
-            </Link>
+          <div className="mt-8 sm:mt-10 flex flex-col items-center w-full">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-3.5 items-center justify-center w-full sm:w-auto">
+              <Link
+                to={user ? "/upload" : "/register"}
+                className="group w-full sm:w-auto inline-flex items-center justify-center gap-2 sm:gap-3 bg-slate-950 hover:bg-slate-800 text-white px-6 sm:px-8 py-3.5 sm:py-4 rounded-full font-bold text-sm sm:text-base shadow-xl shadow-slate-950/20 hover:shadow-2xl hover:shadow-slate-950/30 hover:-translate-y-1 active:translate-y-0 active:scale-[0.98] transition-all duration-200"
+              >
+                <FileUp className="w-4 sm:w-5 h-4 sm:h-5 stroke-[2.2] group-hover:scale-110 transition-transform" />
+                <span>Upload Your Resume</span>
+                <ArrowRight className="w-3.5 sm:w-4 h-3.5 sm:h-4 stroke-[2.2] group-hover:translate-x-1.5 transition-transform duration-200" />
+              </Link>
 
-            <Link
-              to="/demo"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 sm:gap-2.5 bg-[#dce9f4] hover:bg-[#d0e1ee] text-slate-900 border border-slate-200/80 px-6 sm:px-7 py-3.5 sm:py-4 rounded-full font-bold text-sm sm:text-base shadow-sm hover:shadow-md hover:-translate-y-1 active:translate-y-0 active:scale-[0.98] transition-all duration-200"
-            >
-              <Eye className="w-4 sm:w-5 h-4 sm:h-5 stroke-[2.2]" />
-              <span>View Live Demo</span>
-            </Link>
+              <Link
+                to="/demo"
+                className="w-full sm:w-auto inline-flex items-center justify-center gap-2 sm:gap-2.5 bg-[#dce9f4] hover:bg-[#d0e1ee] text-slate-900 border border-slate-200/80 px-6 sm:px-7 py-3.5 sm:py-4 rounded-full font-bold text-sm sm:text-base shadow-sm hover:shadow-md hover:-translate-y-1 active:translate-y-0 active:scale-[0.98] transition-all duration-200"
+              >
+                <Eye className="w-4 sm:w-5 h-4 sm:h-5 stroke-[2.2]" />
+                <span>View Live Demo</span>
+              </Link>
+            </div>
+            {!user && <p className="mt-3 text-xs text-slate-500 font-medium">* Account required to save your portfolio</p>}
           </div>
 
           {/* Trust & Guarantee Micro-tags */}
@@ -282,7 +285,7 @@ export default function Landing() {
                     <ArrowUpRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                   </Link>
                   <Link
-                    to="/upload"
+                    to={user ? "/upload" : "/register"}
                     className="flex-1 sm:flex-initial text-center text-xs font-bold bg-slate-950 hover:bg-slate-800 text-white px-4 py-2 rounded-full shadow-xs transition-all hover:scale-105"
                   >
                     Use This Template →
@@ -297,35 +300,35 @@ export default function Landing() {
         <section className="py-8 sm:py-10 px-4 sm:px-6 border-y border-slate-200/70 bg-white/50 backdrop-blur-md">
           <div className="max-w-5xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6 text-center">
             <div className="p-4 rounded-2xl hover:bg-white/80 transition-all group">
-              <span className="font-display text-3xl sm:text-4xl font-black text-slate-950 tracking-tight block group-hover:scale-110 transition-transform">
-                &lt; 10s
+              <span className="font-display text-2xl sm:text-3xl font-black text-slate-950 tracking-tight block group-hover:scale-110 transition-transform">
+                Lightning Fast
               </span>
-              <span className="text-xs sm:text-sm font-semibold text-slate-500 mt-1 block">
+              <span className="text-xs sm:text-sm font-semibold text-slate-500 mt-2 block">
                 AI Generation Speed
               </span>
             </div>
             <div className="p-4 rounded-2xl hover:bg-white/80 transition-all group">
-              <span className="font-display text-3xl sm:text-4xl font-black text-slate-950 tracking-tight block group-hover:scale-110 transition-transform">
-                8+
+              <span className="font-display text-2xl sm:text-3xl font-black text-slate-950 tracking-tight block group-hover:scale-110 transition-transform">
+                Beautiful
               </span>
-              <span className="text-xs sm:text-sm font-semibold text-slate-500 mt-1 block">
+              <span className="text-xs sm:text-sm font-semibold text-slate-500 mt-2 block">
                 Designer Themes
               </span>
             </div>
             <div className="p-4 rounded-2xl hover:bg-white/80 transition-all group">
-              <span className="font-display text-3xl sm:text-4xl font-black text-slate-950 tracking-tight block group-hover:scale-110 transition-transform">
-                100%
+              <span className="font-display text-2xl sm:text-3xl font-black text-slate-950 tracking-tight block group-hover:scale-110 transition-transform">
+                Responsive
               </span>
-              <span className="text-xs sm:text-sm font-semibold text-slate-500 mt-1 block">
+              <span className="text-xs sm:text-sm font-semibold text-slate-500 mt-2 block">
                 Mobile & Tablet Ready
               </span>
             </div>
             <div className="p-4 rounded-2xl hover:bg-white/80 transition-all group">
-              <span className="font-display text-3xl sm:text-4xl font-black text-slate-950 tracking-tight block group-hover:scale-110 transition-transform flex items-center justify-center gap-1">
-                4.9 <Star className="w-5 h-5 text-amber-500 fill-amber-500 inline" />
+              <span className="font-display text-2xl sm:text-3xl font-black text-slate-950 tracking-tight block group-hover:scale-110 transition-transform">
+                Private
               </span>
-              <span className="text-xs sm:text-sm font-semibold text-slate-500 mt-1 block">
-                Creator Satisfaction
+              <span className="text-xs sm:text-sm font-semibold text-slate-500 mt-2 block">
+                Secure by Default
               </span>
             </div>
           </div>
@@ -500,12 +503,15 @@ export default function Landing() {
                     </li>
                   </ul>
                 </div>
-                <div className="mt-8 pt-4 border-t border-slate-100 flex items-center justify-between text-xs font-bold text-slate-900">
-                  <span>3.8x higher interview callback rate</span>
-                  <Link to="/upload" className="text-blue-600 hover:text-blue-800 flex items-center gap-1 group/btn">
-                    <span>Create now</span>
-                    <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
-                  </Link>
+                <div className="mt-8 pt-4 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs font-bold text-slate-900">
+                  <span>Stand out to hiring managers</span>
+                  <div className="flex flex-col items-start sm:items-end gap-1">
+                    <Link to={user ? "/upload" : "/register"} className="text-blue-600 hover:text-blue-800 flex items-center gap-1 group/btn">
+                      <span>Create now</span>
+                      <ArrowRight className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" />
+                    </Link>
+                    {!user && <span className="text-[10px] text-slate-400 font-medium leading-none">Free account required</span>}
+                  </div>
                 </div>
               </div>
             </div>
@@ -661,11 +667,11 @@ export default function Landing() {
                 Ready to transform your resume?
               </h3>
               <p className="text-slate-400 text-sm sm:text-base max-w-lg mx-auto mb-7 sm:mb-9 leading-relaxed">
-                Join thousands of engineers, designers, and creators presenting their work with interactive AI portfolios.
+                Join engineers, designers, and creators presenting their work with interactive AI portfolios.
               </p>
               <div className="flex flex-col sm:flex-row gap-3 sm:gap-3.5 justify-center items-center">
                 <Link
-                  to="/upload"
+                  to={user ? "/upload" : "/register"}
                   className="w-full sm:w-auto inline-flex items-center justify-center gap-2 sm:gap-2.5 bg-white text-slate-950 hover:bg-slate-100 px-6 sm:px-9 py-3.5 sm:py-4 rounded-full font-bold text-sm sm:text-base shadow-xl transition-all hover:scale-105 active:scale-95 group/btn"
                 >
                   <FileUp className="w-4 h-4 stroke-[2.5]" />
@@ -680,6 +686,7 @@ export default function Landing() {
                   <span>View Live Demo</span>
                 </Link>
               </div>
+              {!user && <p className="mt-5 text-xs text-blue-200/80 font-medium">* Creating a free account is required to generate your portfolio</p>}
             </div>
           </div>
         </section>
@@ -695,14 +702,17 @@ export default function Landing() {
             <span className="font-display font-bold text-slate-900">PortfoliAI</span>
           </div>
           <p className="text-[11px] sm:text-xs text-slate-500">
-            &copy; {new Date().getFullYear()} PortfoliAI. Built for creators & engineers worldwide.
+            &copy; {new Date().getFullYear()}{' '}PortfoliAI. Built for creators & engineers worldwide.
           </p>
           <div className="flex items-center gap-3 sm:gap-4 text-xs font-bold text-slate-600">
             <Link to="/demo" className="hover:text-slate-950 transition-colors">
               Demo
             </Link>
-            <Link to="/login" className="hover:text-slate-950 transition-colors">
-              Log In
+            <Link to="/privacy" className="hover:text-slate-950 transition-colors">
+              Privacy
+            </Link>
+            <Link to="/terms" className="hover:text-slate-950 transition-colors">
+              Terms
             </Link>
             <Link to="/register" className="hover:text-slate-950 transition-colors">
               Get Started

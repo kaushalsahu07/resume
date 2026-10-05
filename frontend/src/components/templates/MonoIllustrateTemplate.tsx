@@ -1,3 +1,4 @@
+import ProfileAvatar from '../common/ProfileAvatar'
 import { useState } from 'react'
 import type { Portfolio } from '../../types/portfolio'
 import {
@@ -323,7 +324,7 @@ export default function MonoIllustrateTemplate({ portfolio }: { portfolio: Portf
               <p className="text-xl sm:text-2xl font-bold text-zinc-800 tracking-tight">
                 Hello I'am <span className="font-extrabold text-black">{name}.</span>
               </p>
-              
+
               <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-black tracking-tight leading-[1.1] break-words">
                 <span>{roleTitle.split(' ')[0] || 'Frontend'}</span>{' '}
                 <span 
@@ -405,9 +406,24 @@ export default function MonoIllustrateTemplate({ portfolio }: { portfolio: Portf
 
           {/* Right Vector Illustration Column */}
           <div className="lg:col-span-5 flex justify-center items-center">
-            <div className="w-full max-w-sm sm:max-w-md">
-              <DeveloperLaptopIllustration className="w-full h-auto drop-shadow-sm" />
-            </div>
+            <ProfileAvatar
+              portfolioId={portfolio.id}
+              alt={name}
+              className="group relative w-60 h-72 sm:w-72 sm:h-[22rem] rotate-2 hover:rotate-0 transition-transform duration-300 border-[3px] border-black bg-white p-3 pb-12 shadow-[10px_10px_0_0_#000]"
+              imgClassName="grayscale contrast-125 group-hover:grayscale-0 transition-all duration-500 border-2 border-black"
+              fallback={
+                <div className="w-full max-w-sm sm:max-w-md">
+                  <DeveloperLaptopIllustration className="w-full h-auto drop-shadow-sm" />
+                </div>
+              }
+            >
+              <span className="absolute bottom-3 left-0 right-0 text-center font-mono text-xs sm:text-sm font-bold tracking-tight text-black">
+                {name}
+              </span>
+              <span className="absolute -top-4 -left-4 rounded-md bg-black px-2.5 py-1 font-mono text-[10px] sm:text-xs font-bold uppercase tracking-widest text-white -rotate-6">
+                Hi there!
+              </span>
+            </ProfileAvatar>
           </div>
 
         </div>

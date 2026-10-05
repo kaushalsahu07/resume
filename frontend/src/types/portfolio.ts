@@ -5,7 +5,6 @@ export interface Portfolio {
   headline: string | null;
   summary: string | null;
   isPublished: boolean;
-  viewCount: number;
   education: Education[];
   experience: Experience[];
   projects: Project[];

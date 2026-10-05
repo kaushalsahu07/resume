@@ -38,3 +38,9 @@ export function sanitizePortfolioLinks(portfolio: any) {
     })
   };
 }
+
+export function getProfilePicUrl(portfolioId: string): string {
+  // If we had a way to read VITE_SUPABASE_URL here we would, but hardcoding for simplicity
+  // since it's only one supabase instance for this project.
+  return `https://noxjoecewshigwqhhzls.supabase.co/storage/v1/object/public/avatars/${portfolioId}.webp`
+}

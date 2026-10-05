@@ -35,6 +35,8 @@ def sitemap_xml():
     static_pages = [
         {"loc": f"{SITE_URL}/", "priority": "1.0", "changefreq": "weekly"},
         {"loc": f"{SITE_URL}/demo", "priority": "0.7", "changefreq": "monthly"},
+        {"loc": f"{SITE_URL}/privacy", "priority": "0.5", "changefreq": "monthly"},
+        {"loc": f"{SITE_URL}/terms", "priority": "0.5", "changefreq": "monthly"},
     ]
 
     for page in static_pages:

@@ -1,3 +1,4 @@
+import ProfileAvatar from '../common/ProfileAvatar'
 import type { Portfolio } from '../../types/portfolio'
 import { SocialIcon } from '../common/SocialIcon'
 
@@ -83,6 +84,17 @@ export default function EmeraldEditorialTemplate({ portfolio }: { portfolio: Por
               <div className="relative mx-auto w-full max-w-[620px] pt-2">
                 <div className="relative flex min-h-[280px] items-center justify-center overflow-visible sm:min-h-[340px] lg:min-h-[420px]">
                   <div className="absolute right-2 top-0 h-16 w-16 rounded-full bg-[#f4c7d6]/80 blur-2xl sm:right-6 sm:h-20 sm:w-20" />
+
+                  <ProfileAvatar
+                    portfolioId={portfolio.id}
+                    alt={name}
+                    className="absolute -bottom-4 left-1 z-20 h-24 w-24 rounded-full border-[5px] border-white bg-[#f7edf0] shadow-[0_20px_40px_rgba(255,77,146,0.30)] outline outline-2 outline-offset-4 outline-[#ff4d92]/60 transition-transform duration-300 hover:scale-105 hover:-rotate-3 sm:-bottom-6 sm:-left-4 sm:h-32 sm:w-32 lg:h-36 lg:w-36"
+                    imgClassName="rounded-full"
+                  >
+                    <span className="absolute -right-3 top-1 rotate-12 rounded-full bg-[#ff4d92] px-2.5 py-1 text-[9px] font-bold uppercase tracking-[0.12em] text-white shadow-[0_8px_16px_rgba(255,77,146,0.35)] sm:text-[10px]">
+                      Hi! 👋
+                    </span>
+                  </ProfileAvatar>
 
                   <div className="relative z-10 w-full max-w-[560px] rounded-[22px] border border-white/60 bg-white/20 p-3 shadow-[0_40px_60px_rgba(217,154,175,0.16)] backdrop-blur-[2px] sm:rounded-[28px] sm:p-4">
                     <div className="rounded-[20px] bg-[#efe3e6] p-3 shadow-[inset_0_0_0_1px_rgba(255,255,255,0.5)] sm:rounded-[24px] sm:p-4">

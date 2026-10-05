@@ -99,6 +99,19 @@ export default function Register() {
               onChange={e => setPassword(e.target.value)}
             />
           </div>
+          
+          <div className="flex items-start gap-2.5 mt-2">
+            <input 
+              type="checkbox" 
+              required
+              id="terms"
+              className="mt-1 w-4 h-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+            />
+            <label htmlFor="terms" className="text-sm text-slate-600 leading-snug">
+              I agree to the <Link to="/terms" className="font-semibold text-slate-900 hover:underline" target="_blank">Terms of Service</Link> and <Link to="/privacy" className="font-semibold text-slate-900 hover:underline" target="_blank">Privacy Policy</Link>. I understand that my data will never be sold.
+            </label>
+          </div>
+          
           <button 
             type="submit" 
             className="w-full mt-2 bg-slate-950 hover:bg-slate-800 text-white py-3 rounded-xl font-semibold text-sm shadow-sm hover:shadow-md transition-all hover:scale-[1.01] active:scale-[0.99] flex items-center justify-center gap-2 group"

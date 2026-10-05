@@ -18,7 +18,6 @@ const SAMPLE_PERSONAS: Record<string, Portfolio> = {
     headline: 'Alex Morgan',
     summary: 'Senior Full Stack Engineer with 6+ years of experience architecting high-throughput distributed systems and delightful React interfaces. Passionate about developer tooling, performance optimization, and AI applications.',
     isPublished: false,
-    viewCount: 0,
     education: [
       { id: 'e1', institution: 'University of California, Berkeley', degree: 'B.S. Computer Science', startDate: '2015', endDate: '2019', order: 0 }
     ],
@@ -53,7 +52,6 @@ const SAMPLE_PERSONAS: Record<string, Portfolio> = {
     headline: 'Elena Vance',
     summary: 'Lead Product Designer & Design Systems Architect with 7+ years shaping intuitive user experiences for fintech and enterprise SaaS products. Focused on accessibility, micro-interactions, and visual storytelling.',
     isPublished: false,
-    viewCount: 0,
     education: [
       { id: 'e1', institution: 'Rhode Island School of Design', degree: 'B.F.A. Industrial Design & HCI', startDate: '2014', endDate: '2018', order: 0 }
     ],
@@ -87,7 +85,6 @@ const SAMPLE_PERSONAS: Record<string, Portfolio> = {
     headline: 'Dr. Marcus Chen',
     summary: 'Machine Learning Research Engineer specializing in Large Language Models, Retrieval-Augmented Generation (RAG), and efficient inference pipelines. Author of 4 top-tier conference publications.',
     isPublished: false,
-    viewCount: 0,
     education: [
       { id: 'e1', institution: 'Stanford University', degree: 'Ph.D. in Computer Science & AI', startDate: '2018', endDate: '2022', order: 0 }
     ],
@@ -120,7 +117,7 @@ export default function Upload() {
   const [errorMsg, setErrorMsg] = useState('')
   const [selectedTemplateId, setSelectedTemplateId] = useState<string>('dark-grid')
   const [isDragging, setIsDragging] = useState(false)
-  const [loadingStep, setLoadingStep] = useState(0)
+  const [loadingMessageIndex, setLoadingMessageIndex] = useState(0)
   const [progressPercent, setProgressPercent] = useState(0)
 
   useEffect(() => {
@@ -174,45 +171,61 @@ export default function Upload() {
     }
   }
 
-  const handleTryPersona = (personaKey: 'engineer' | 'designer' | 'ai') => {
+  const handleTryPersona = async (personaKey: 'engineer' | 'designer' | 'ai') => {
     const targetPortfolio = SAMPLE_PERSONAS[personaKey]
     setState('uploading')
-    setLoadingStep(1)
+    setLoadingMessageIndex(0)
     setProgressPercent(25)
 
-    setTimeout(() => {
-      setLoadingStep(2)
+    try {
+      // Create the sample portfolio in the backend so it's saved in the database
+      const createdPortfolio = await apiClient.request<Portfolio>('/portfolios', {
+        method: 'POST',
+        body: JSON.stringify({ ...targetPortfolio, templateId: selectedTemplateId })
+      })
+
+      setLoadingMessageIndex(2)
       setProgressPercent(60)
+      
       setTimeout(() => {
-        setLoadingStep(3)
-        setProgressPercent(95)
+        setLoadingMessageIndex(4)
+        setProgressPercent(100)
+        setState('done')
         setTimeout(() => {
-          setState('done')
-          setProgressPercent(100)
-          navigate(`/editor/${targetPortfolio.id}`, {
-            state: { templateId: selectedTemplateId, portfolio: { ...targetPortfolio, templateId: selectedTemplateId } }
+          navigate(`/editor/${createdPortfolio.id}`, {
+            state: { templateId: selectedTemplateId, portfolio: createdPortfolio }
           })
         }, 500)
       }, 600)
-    }, 600)
+    } catch (err: any) {
+      setState('error')
+      setErrorMsg(err.message || 'Failed to create sample portfolio.')
+    }
   }
+
+  const LOADING_MESSAGES = [
+    "Uploading your resume securely...",
+    "Extracting experience...",
+    "Structuring skills...",
+    "Formatting education and projects...",
+    "Applying designer template...",
+    "Finalizing portfolio layout..."
+  ]
 
   const processUpload = async () => {
     if (!file) return
     setState('uploading')
-    setLoadingStep(1)
-    setProgressPercent(20)
+    setLoadingMessageIndex(0)
+    setProgressPercent(15)
 
-    const loadingStates = ['uploading', 'extracting', 'structuring'] as const
-    let currentStateIndex = 0
+    let currentIndex = 0
     const interval = setInterval(() => {
-      if (currentStateIndex < loadingStates.length - 1) {
-        currentStateIndex++
-        setState(loadingStates[currentStateIndex])
-        setLoadingStep(currentStateIndex + 1)
-        setProgressPercent((currentStateIndex + 1) * 32)
+      currentIndex++
+      if (currentIndex < LOADING_MESSAGES.length) {
+        setLoadingMessageIndex(currentIndex)
+        setProgressPercent((prev) => Math.min(prev + (80 / LOADING_MESSAGES.length), 95))
       }
-    }, 1800)
+    }, 2000)
 
     try {
       const formData = new FormData()
@@ -225,7 +238,7 @@ export default function Upload() {
 
       clearInterval(interval)
       setState('done')
-      setLoadingStep(3)
+      setLoadingMessageIndex(LOADING_MESSAGES.length - 1)
       setProgressPercent(100)
 
       setTimeout(() => {
@@ -452,23 +465,23 @@ export default function Upload() {
                 />
               </div>
 
-              {/* Steps Checklist */}
-              <div className="w-full space-y-4 bg-slate-50 p-6 rounded-2xl border border-slate-200/80 text-left">
-                <StatusStep
-                  label="Uploading file securely"
-                  isActive={state === 'uploading' || loadingStep === 1}
-                  isDone={['extracting', 'structuring', 'done'].includes(state) || loadingStep > 1}
-                />
-                <StatusStep
-                  label="Deep parsing career history & accomplishments"
-                  isActive={state === 'extracting' || loadingStep === 2}
-                  isDone={['structuring', 'done'].includes(state) || loadingStep > 2}
-                />
-                <StatusStep
-                  label="Generating interactive portfolio & themes"
-                  isActive={state === 'structuring' || loadingStep === 3}
-                  isDone={state === 'done' || loadingStep >= 3}
-                />
+              {/* Dynamic Steps Checklist */}
+              <div className="w-full space-y-3 bg-slate-50 p-6 rounded-2xl border border-slate-200/80 text-left h-64 overflow-hidden relative">
+                <div 
+                  className="transition-transform duration-500 ease-out flex flex-col gap-4"
+                  style={{ transform: `translateY(-${Math.max(0, loadingMessageIndex - 2) * 44}px)` }}
+                >
+                  {LOADING_MESSAGES.map((msg, idx) => (
+                    <StatusStep
+                      key={idx}
+                      label={msg}
+                      isActive={loadingMessageIndex === idx}
+                      isDone={loadingMessageIndex > idx || state === 'done'}
+                    />
+                  ))}
+                </div>
+                {/* Fade out effect at the bottom */}
+                <div className="absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-slate-50 to-transparent pointer-events-none" />
               </div>
             </div>
           )}

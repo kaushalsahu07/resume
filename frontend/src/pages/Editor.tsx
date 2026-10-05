@@ -4,12 +4,13 @@ import {
   ArrowLeft, Send, Eye, Edit3, ArrowUp, ArrowDown, Plus, Trash2,
   Bot, Sparkles, Check, ExternalLink,
   Monitor, Smartphone, ChevronDown, ChevronUp, Wand2,
-  AlertTriangle, CheckCircle2, Loader2
+  AlertTriangle, CheckCircle2, Loader2, Upload
 } from 'lucide-react'
 import type { Portfolio } from '../types/portfolio'
 import { apiClient } from '../lib/apiClient'
-import { getPortfolioPublicUrl } from '../lib/portfolioUrl'
+import { getPortfolioPublicUrl, getProfilePicUrl } from '../lib/portfolioUrl'
 import { templates } from '../components/templates'
+import { notifyAvatarUpdated } from '../components/common/ProfileAvatar'
 
 export default function Editor() {
   const { portfolioId } = useParams()
@@ -21,6 +22,7 @@ export default function Editor() {
   // Chat & Editor State
   const [editorMode, setEditorMode] = useState<'chat' | 'manual'>('chat')
   const [chatInput, setChatInput] = useState('')
+  const [profilePicKey, setProfilePicKey] = useState(Date.now())
   const [chatHistory, setChatHistory] = useState<{ role: 'user' | 'ai'; content: string }[]>([])
   const [remainingRequests, setRemainingRequests] = useState(1000)
   const [isChatLoading, setIsChatLoading] = useState(false)
@@ -94,21 +96,28 @@ export default function Editor() {
   }
 
   useEffect(() => {
+    // Use location.state for instant initial render if available
     if (location.state?.portfolio) {
       setPortfolio(location.state.portfolio)
-      return
     }
 
+    // Always fetch latest from backend to prevent stale data on F5 refresh
     if (portfolioId) {
       apiClient.request<Portfolio>(`/portfolios/${portfolioId}`)
         .then(data => {
           setPortfolio(data)
+          // Optionally clear the state so it doesn't stay in history forever
+          window.history.replaceState({}, document.title)
         })
         .catch(err => {
           console.error("Failed to load portfolio:", err)
+          if (!location.state?.portfolio) {
+            alert("Failed to load portfolio. It may have been deleted or does not exist.")
+            navigate('/dashboard')
+          }
         })
     }
-  }, [portfolioId, location.state])
+  }, [portfolioId, navigate])
 
   // Debounced auto-save for full portfolio
   useEffect(() => {
@@ -261,11 +270,54 @@ export default function Editor() {
 
       const data = await res.json()
       const newProj = [...portfolio.projects]
-      newProj[idx].imageUrl = data.secure_url
+      newProj[idx] = { ...newProj[idx], imageUrl: data.secure_url }
       handleUpdate({ projects: newProj })
+      
+      // Force immediate save to prevent data loss if user refreshes quickly
+      try {
+        await apiClient.request(`/portfolios/${portfolioId}/sync`, {
+          method: 'PUT',
+          body: JSON.stringify({ ...portfolio, projects: newProj })
+        })
+      } catch (err) {
+        console.error("Immediate save failed after image upload", err)
+      }
     } catch (error) {
       console.error(error)
       alert("Failed to upload image. Check your Cloudinary configuration.")
+    }
+  }
+
+  const handleProfilePicUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    if (file.size > 5 * 1024 * 1024) {
+      alert("Profile picture must be less than 5MB")
+      return
+    }
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const uploadingToast = document.createElement('div')
+      uploadingToast.innerText = "Compressing & uploading..."
+      uploadingToast.className = "fixed bottom-4 right-4 bg-slate-950 text-white px-4 py-2 rounded-lg shadow-lg z-50 text-sm font-bold animate-pulse"
+      document.body.appendChild(uploadingToast)
+
+      await apiClient.request(`/portfolios/${portfolioId}/profile-picture`, {
+        method: 'POST',
+        body: formData,
+      })
+
+      document.body.removeChild(uploadingToast)
+      
+      // Force reload of the image by updating the key
+      setProfilePicKey(Date.now())
+      if (portfolioId) notifyAvatarUpdated(portfolioId)
+    } catch (error: any) {
+      console.error(error)
+      alert(error.message || "Failed to upload profile picture.")
     }
   }
 
@@ -296,8 +348,12 @@ export default function Editor() {
     handleUpdate({ skills: portfolio.skills.filter(s => s.id !== skillId) })
   }
 
-  const handlePublish = async () => {
-    if (!portfolio.slug) {
+  const handlePublish = async (e?: React.MouseEvent) => {
+    if (e) {
+      e.preventDefault()
+      e.stopPropagation()
+    }
+    if (!portfolio?.slug) {
       alert("Please enter a custom URL slug before publishing.")
       return
     }
@@ -337,6 +393,7 @@ export default function Editor() {
       setCopied(true)
       setTimeout(() => setCopied(false), 3000)
     } catch (err: any) {
+      console.error('Publish error:', err)
       alert(err.message || 'Failed to publish')
     }
   }
@@ -577,15 +634,35 @@ export default function Editor() {
                 {openSections.header ? <ChevronUp className="w-4 h-4 text-slate-500" /> : <ChevronDown className="w-4 h-4 text-slate-500" />}
               </div>
               {openSections.header && (
-                <div className="mt-3 space-y-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-600 mb-1">Full Name / Headline</label>
-                    <input
-                      type="text"
-                      className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-slate-900"
-                      value={portfolio.headline || ''}
-                      onChange={e => handleUpdate({ headline: e.target.value })}
-                    />
+                <div className="mt-4 space-y-4">
+                  <div className="flex items-center gap-4">
+                    <div className="relative group shrink-0">
+                      <div className="w-16 h-16 rounded-full bg-slate-100 border border-slate-200 overflow-hidden flex items-center justify-center">
+                        {portfolio?.id && (
+                          <img 
+                            src={`${getProfilePicUrl(portfolio.id)}?t=${profilePicKey}`} 
+                            alt="Profile" 
+                            className="w-full h-full object-cover"
+                            onError={(e) => e.currentTarget.style.display = 'none'}
+                            onLoad={(e) => e.currentTarget.style.display = 'block'}
+                          />
+                        )}
+                      </div>
+                      <label className="absolute inset-0 bg-black/50 text-white opacity-0 group-hover:opacity-100 transition-opacity rounded-full flex flex-col items-center justify-center cursor-pointer text-[10px] font-bold cursor-pointer">
+                        <Upload className="w-4 h-4 mb-0.5" />
+                        <span>Upload</span>
+                        <input type="file" accept="image/*" className="hidden" onChange={handleProfilePicUpload} />
+                      </label>
+                    </div>
+                    <div className="flex-1">
+                      <label className="block text-xs font-semibold text-slate-600 mb-1">Full Name / Headline</label>
+                      <input
+                        type="text"
+                        className="w-full px-3 py-2 border border-slate-200 rounded-lg bg-white text-xs sm:text-sm focus:outline-none focus:ring-1 focus:ring-slate-900"
+                        value={portfolio.headline || ''}
+                        onChange={e => handleUpdate({ headline: e.target.value })}
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-xs font-semibold text-slate-600 mb-1">Professional Summary</label>
@@ -1120,6 +1197,7 @@ export default function Editor() {
             {/* Publish & Share button */}
             <div className="flex items-center gap-2">
               <button
+                type="button"
                 onClick={handlePublish}
                 disabled={slugStatus === 'taken'}
                 className={`flex items-center gap-1.5 px-3 sm:px-4 py-1.5 rounded-full text-xs font-bold shadow-sm transition-all whitespace-nowrap ${

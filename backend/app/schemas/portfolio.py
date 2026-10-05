@@ -81,7 +81,6 @@ class Portfolio(BaseCamelModel):
     headline: Optional[str] = None
     summary: Optional[str] = None
     is_published: bool = False
-    view_count: int = 0
     education: List[EducationItem] = []
     experience: List[ExperienceItem] = []
     projects: List[ProjectItem] = []

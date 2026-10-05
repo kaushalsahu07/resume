@@ -29,3 +29,21 @@ def get_current_user(authorization: str = Header(...)) -> str:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail=f"Invalid token: {str(e)}",
         )
+
+from typing import Optional
+
+def get_optional_user(authorization: Optional[str] = Header(None)) -> Optional[str]:
+    """
+    Like get_current_user but returns None if token is missing or invalid.
+    """
+    if not authorization or not authorization.startswith("Bearer "):
+        return None
+    token = authorization.replace("Bearer ", "")
+    try:
+        user_resp = supabase.auth.get_user(token)
+        if user_resp and user_resp.user:
+            return user_resp.user.id
+    except Exception as e:
+        print(f"[DEBUG] get_optional_user failed: {e}")
+        pass
+    return None

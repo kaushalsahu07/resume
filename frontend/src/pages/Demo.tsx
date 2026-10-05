@@ -13,7 +13,6 @@ export const mockPortfolio: Portfolio = {
   headline: 'Jane Doe',
   summary: 'A passionate software engineer & UI/UX designer with 5+ years of experience building scalable web applications and intuitive user interfaces. Dedicated to clean code, accessible design, and delightful digital products.',
   isPublished: true,
-  viewCount: 42,
   education: [
     { id: 'e1', institution: 'University of Technology', degree: 'B.S. Computer Science', field: 'Software Systems', startDate: '2015', endDate: '2019', order: 0 }
   ],
@@ -22,8 +21,8 @@ export const mockPortfolio: Portfolio = {
     { id: 'x2', company: 'Web Solutions LLC', role: 'Full Stack Developer', startDate: '2019', endDate: '2021', description: 'Developed responsive client web apps, design systems, and cloud APIs using React, Node.js, and TypeScript.', order: 1 }
   ],
   projects: [
-    { id: 'p1', title: 'PortfoliAI Platform', description: 'An AI-powered resume to dynamic single-page portfolio generator with multi-provider failover.', techStack: ['React', 'TypeScript', 'FastAPI', 'Tailwind CSS'], link: 'https://github.com', order: 0 },
-    { id: 'p2', title: 'E-commerce Analytics Hub', description: 'A real-time metrics and analytics dashboard for global merchants with live chart telemetry.', techStack: ['React', 'D3.js', 'PostgreSQL', 'Tailwind CSS'], link: 'https://github.com', order: 1 }
+    { id: 'p1', title: 'PortfoliAI Platform', description: 'An AI-powered resume to dynamic single-page portfolio generator with multi-provider failover.', techStack: ['React', 'TypeScript', 'FastAPI', 'Tailwind CSS'], link: 'https://github.com/username/portfoliai-platform', order: 0 },
+    { id: 'p2', title: 'E-commerce Analytics Hub', description: 'A real-time metrics and analytics dashboard for global merchants with live chart telemetry.', techStack: ['React', 'D3.js', 'PostgreSQL', 'Tailwind CSS'], link: 'https://github.com/username/analytics-hub', order: 1 }
   ],
   skills: [
     { id: 's1', name: 'TypeScript', category: 'Languages' },
@@ -39,9 +38,9 @@ export const mockPortfolio: Portfolio = {
     { id: 'a1', title: 'Best Design Innovation Award', description: 'Awarded 1st place in national UI/UX hackathon.', date: '2023' }
   ],
   links: [
-    { id: 'l1', label: 'GitHub', url: 'https://github.com' },
-    { id: 'l2', label: 'LinkedIn', url: 'https://linkedin.com' },
-    { id: 'l3', label: 'Email', url: 'mailto:jane@example.com' }
+    { id: 'l1', label: 'GitHub', url: 'https://github.com/username' },
+    { id: 'l2', label: 'LinkedIn', url: 'https://linkedin.com/in/' },
+    { id: 'l3', label: 'Email', url: 'mailto:kaushalsahu.me@gmail.com' }
   ]
 }
 

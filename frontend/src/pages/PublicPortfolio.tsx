@@ -1,11 +1,12 @@
 import { useEffect, useState, useMemo } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useSearchParams } from 'react-router-dom'
 import { apiClient } from '../lib/apiClient'
 import type { Portfolio } from '../types/portfolio'
 import { getTemplateById } from '../components/templates'
 import { Sparkles, ArrowRight } from 'lucide-react'
 import { useSEO, buildPortfolioJsonLd } from '../hooks/useSEO'
 import { sanitizePortfolioLinks } from '../lib/portfolioUrl'
+import { mockPortfolio } from './Demo'
 
 export function getSubdomainFromHostname(hostname = window.location.hostname): string | null {
   const parts = hostname.split('.')
@@ -31,6 +32,8 @@ export function getSubdomainFromHostname(hostname = window.location.hostname): s
 
 export default function PublicPortfolio({ subdomainSlug }: { subdomainSlug?: string }) {
   const { slug: paramSlug } = useParams()
+  const [searchParams] = useSearchParams()
+  const isPreview = searchParams.get('preview') === 'true'
   const slug = subdomainSlug || paramSlug || getSubdomainFromHostname()
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null)
   const [loading, setLoading] = useState(true)
@@ -42,9 +45,16 @@ export default function PublicPortfolio({ subdomainSlug }: { subdomainSlug?: str
       setLoading(false)
       return
     }
+
+    if (slug.toLowerCase() === 'jane') {
+      setPortfolio({ ...mockPortfolio, templateId: 'cosmic-violet' })
+      setLoading(false)
+      return
+    }
+
     const fetchPortfolio = async () => {
       try {
-        const data = await apiClient.request<Portfolio>(`/p/${slug}`)
+        const data = await apiClient.request<Portfolio>(`/p/${slug}?preview=${isPreview}`)
         setPortfolio(data)
       } catch {
         setError(true)
@@ -53,7 +63,7 @@ export default function PublicPortfolio({ subdomainSlug }: { subdomainSlug?: str
       }
     }
     fetchPortfolio()
-  }, [slug])
+  }, [slug, isPreview])
 
   // Build JSON-LD structured data for this portfolio
   const jsonLd = useMemo(() => {

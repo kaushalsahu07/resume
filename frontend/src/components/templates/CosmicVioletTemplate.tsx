@@ -1,3 +1,4 @@
+import ProfileAvatar from '../common/ProfileAvatar'
 import { useState } from 'react'
 import type { Portfolio } from '../../types/portfolio'
 import {
@@ -360,11 +361,19 @@ export default function CosmicVioletTemplate({ portfolio }: { portfolio: Portfol
                   {/* Profile Spotlight Header */}
                   <div className="flex items-center gap-3.5 sm:gap-4">
                     <div className="relative flex-shrink-0">
-                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-purple-600 via-fuchsia-500 to-indigo-500 p-[2px] shadow-lg shadow-purple-900/50">
-                        <div className="w-full h-full bg-[#130826] rounded-[14px] flex items-center justify-center text-lg sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-tr from-purple-200 to-fuchsia-100">
-                          {initials}
-                        </div>
-                      </div>
+                      <ProfileAvatar
+                        portfolioId={portfolio.id}
+                        alt={name}
+                        className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-[22px] bg-gradient-to-tr from-purple-600 via-fuchsia-500 to-indigo-500 p-[2.5px] shadow-[0_0_30px_-4px_rgba(192,38,211,0.6)]"
+                        imgClassName="rounded-[19px] bg-[#130826]"
+                        fallback={
+                          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-purple-600 via-fuchsia-500 to-indigo-500 p-[2px] shadow-lg shadow-purple-900/50">
+                            <div className="w-full h-full bg-[#130826] rounded-[14px] flex items-center justify-center text-lg sm:text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-tr from-purple-200 to-fuchsia-100">
+                              {initials}
+                            </div>
+                          </div>
+                        }
+                      />
                       <span className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-emerald-500 border-2 border-[#130826] flex items-center justify-center">
                         <span className="w-1.5 h-1.5 rounded-full bg-white" />
                       </span>

@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { 
   Plus, ArrowRight, ExternalLink, Trash2, LayoutDashboard, 
-  PenTool, Copy, Check, Eye, Sparkles, Wand2
+  PenTool, Copy, Check, Eye, EyeOff, Sparkles, Wand2
 } from 'lucide-react'
 import { useState, useEffect } from 'react'
 import { apiClient } from '../lib/apiClient'
@@ -47,6 +47,23 @@ export default function Dashboard() {
     }
   }
 
+  const handleUnpublish = async (id: string, e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+    
+    if (!window.confirm('Are you sure you want to unpublish this portfolio? It will no longer be visible to the public, but the URL will remain reserved for you.')) {
+      return
+    }
+    
+    try {
+      await apiClient.request(`/portfolios/${id}/unpublish`, { method: 'POST' })
+      setPortfolios(prev => prev.map(p => p.id === id ? { ...p, isPublished: false } : p))
+    } catch (err) {
+      console.error('Failed to unpublish portfolio:', err)
+      alert('Failed to unpublish portfolio. Please try again.')
+    }
+  }
+
   const handleCopyLink = (slug: string, id: string, e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
@@ -57,7 +74,6 @@ export default function Dashboard() {
   }
 
   const publishedCount = portfolios.filter(p => p.isPublished).length
-
   if (loading) return (
     <div className="max-w-6xl w-full mx-auto p-4 sm:p-6 py-12">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10 animate-pulse">
@@ -97,7 +113,7 @@ export default function Dashboard() {
 
       {/* Metrics Row */}
       {portfolios.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-10 opacity-0 animate-fade-in-up" style={{ animationDelay: '80ms' }}>
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-10 opacity-0 animate-fade-in-up" style={{ animationDelay: '80ms' }}>
           <div className="glass-card bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Portfolios</span>
             <span className="text-2xl sm:text-3xl font-black text-slate-900 mt-1 block">{portfolios.length}</span>
@@ -106,7 +122,7 @@ export default function Dashboard() {
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">Live Sites</span>
             <span className="text-2xl sm:text-3xl font-black text-emerald-600 mt-1 block">{publishedCount}</span>
           </div>
-          <div className="glass-card bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all">
+          <div className="glass-card bg-white p-4 sm:p-5 rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md transition-all sm:col-span-2">
             <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block">AI Status</span>
             <span className="text-sm font-black text-slate-900 mt-2 block flex items-center gap-1.5">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
@@ -173,17 +189,26 @@ export default function Dashboard() {
 
                   <div className="flex items-center gap-1">
                     {portfolio.isPublished && (
-                      <button
-                        onClick={(e) => handleCopyLink(portfolio.slug, portfolio.id, e)}
-                        className="text-slate-400 hover:text-slate-900 transition-colors p-1.5 rounded-lg hover:bg-slate-100 relative"
-                        title="Copy live link"
-                      >
-                        {copiedId === portfolio.id ? (
-                          <Check className="w-4 h-4 text-emerald-600" />
-                        ) : (
-                          <Copy className="w-4 h-4" />
-                        )}
-                      </button>
+                      <>
+                        <button
+                          onClick={(e) => handleCopyLink(portfolio.slug, portfolio.id, e)}
+                          className="text-slate-400 hover:text-slate-900 transition-colors p-1.5 rounded-lg hover:bg-slate-100 relative"
+                          title="Copy live link"
+                        >
+                          {copiedId === portfolio.id ? (
+                            <Check className="w-4 h-4 text-emerald-600" />
+                          ) : (
+                            <Copy className="w-4 h-4" />
+                          )}
+                        </button>
+                        <button
+                          onClick={(e) => handleUnpublish(portfolio.id, e)}
+                          className="text-slate-400 hover:text-amber-600 transition-colors p-1.5 rounded-lg hover:bg-amber-50"
+                          title="Unpublish portfolio"
+                        >
+                          <EyeOff className="w-4 h-4" />
+                        </button>
+                      </>
                     )}
                     <button
                       onClick={(e) => handleDelete(portfolio.id, e)}
@@ -204,7 +229,7 @@ export default function Dashboard() {
                 </p>
 
                 {/* Meta details */}
-                <div className="flex items-center gap-2 text-xs font-semibold text-slate-400 mb-6">
+                <div className="flex items-center gap-3 text-xs font-semibold text-slate-400 mb-6">
                   <span className="capitalize">{portfolio.templateId?.replace('-', ' ')}</span>
                 </div>
               </div>
@@ -220,7 +245,7 @@ export default function Dashboard() {
                 </Link>
                 {portfolio.isPublished && (
                   <a
-                    href={getPortfolioPublicUrl(portfolio.slug)}
+                    href={`${getPortfolioPublicUrl(portfolio.slug)}?preview=true`}
                     target="_blank"
                     rel="noreferrer"
                     className="flex items-center justify-center gap-1.5 px-4 bg-slate-100 hover:bg-slate-200 text-slate-800 py-2.5 rounded-xl text-xs font-bold transition-all hover:scale-[1.02]"

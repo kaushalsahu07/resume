@@ -85,7 +85,8 @@ async def upload_resume(
             "links":        links,
         })
 
-        return portfolio
+        from app.routers.portfolios import _format_portfolio
+        return _format_portfolio(portfolio)
 
     except HTTPException:
         raise

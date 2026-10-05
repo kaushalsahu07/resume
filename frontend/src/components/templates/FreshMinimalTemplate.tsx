@@ -1,3 +1,4 @@
+import ProfileAvatar from '../common/ProfileAvatar'
 import type { Portfolio } from '../../types/portfolio'
 import { ExternalLink } from 'lucide-react'
 import { SocialIcon } from '../common/SocialIcon'
@@ -7,9 +8,15 @@ export default function FreshMinimalTemplate({ portfolio }: { portfolio: Portfol
     <div className="min-h-screen w-full bg-white text-slate-900 font-sans selection:bg-slate-200">
       <div className="max-w-3xl mx-auto px-6 py-20">
         <header className="mb-20">
-          <h1 className="text-4xl sm:text-5xl font-display font-extrabold tracking-tight mb-4 text-slate-950">
-            {portfolio.headline || 'Your Name'}
-          </h1>
+          <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-6">
+            <ProfileAvatar
+              portfolioId={portfolio.id}
+              className="relative shrink-0 w-24 h-24 sm:w-28 sm:h-28 rounded-[28px] overflow-hidden bg-slate-100 ring-4 ring-white shadow-[0_10px_40px_-10px_rgba(15,23,42,0.35)] outline outline-1 outline-slate-200 transition-transform duration-300 hover:-rotate-2 hover:scale-[1.03]"
+            />
+            <h1 className="text-4xl sm:text-5xl font-display font-extrabold tracking-tight text-slate-950">
+              {portfolio.headline || 'Your Name'}
+            </h1>
+          </div>
           {portfolio.summary && (
             <p className="text-lg sm:text-xl text-slate-600 leading-relaxed max-w-2xl font-normal">
               {portfolio.summary}

@@ -58,16 +58,13 @@ export function useSEO({
     if (canonicalUrl) {
       setMeta('property', 'og:url', canonicalUrl)
     }
-    if (ogImage) {
-      setMeta('property', 'og:image', ogImage)
-    }
+    const finalOgImage = ogImage || `${SITE_URL}/opengraph.png`
+    setMeta('property', 'og:image', finalOgImage)
 
     // Twitter
     setMeta('name', 'twitter:title', fullTitle)
     setMeta('name', 'twitter:description', desc)
-    if (ogImage) {
-      setMeta('name', 'twitter:image', ogImage)
-    }
+    setMeta('name', 'twitter:image', finalOgImage)
 
     // Canonical
     let canonicalEl = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null

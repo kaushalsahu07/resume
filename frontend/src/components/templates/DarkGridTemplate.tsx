@@ -1,3 +1,4 @@
+import ProfileAvatar from '../common/ProfileAvatar'
 import { useState } from 'react'
 import type { Portfolio } from '../../types/portfolio'
 import {
@@ -196,6 +197,18 @@ export default function DarkGridTemplate({ portfolio }: { portfolio: Portfolio }
                     </div>
                     <span className="text-[10px] uppercase tracking-[0.2em] text-emerald-300/80">portfolio</span>
                   </div>
+
+                  <ProfileAvatar
+                    portfolioId={portfolio.id}
+                    alt={name}
+                    className="relative mx-auto mt-4 sm:mt-6 h-24 w-24 sm:h-32 sm:w-32 rounded-2xl sm:rounded-3xl p-[3px] bg-gradient-to-br from-emerald-300 via-emerald-500/60 to-lime-300/70 shadow-[0_0_40px_-6px_rgba(52,211,153,0.55)]"
+                    imgClassName="rounded-[14px] sm:rounded-[22px] bg-[#0a1713]"
+                  >
+                    <span className="absolute -bottom-1 -right-1 flex h-4 w-4 sm:h-5 sm:w-5 items-center justify-center rounded-full bg-[#0a1713]">
+                      <span className="absolute h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-emerald-400 animate-ping opacity-60" />
+                      <span className="relative h-2.5 w-2.5 sm:h-3 sm:w-3 rounded-full bg-emerald-400" />
+                    </span>
+                  </ProfileAvatar>
 
                   <div className="mt-3 sm:mt-5 space-y-1.5 font-mono text-[11px] sm:text-sm text-zinc-300">
                     <div className="text-emerald-300">const profile = {'{'}</div>

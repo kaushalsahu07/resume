@@ -1,10 +1,12 @@
 from typing import List
-from fastapi import APIRouter, Depends, HTTPException, Header, status
+from fastapi import APIRouter, Depends, HTTPException, Header, status, UploadFile, File
 from app.core.auth import get_current_user
 from app.core.config import settings
 from app.core.supabase_client import supabase_admin
 from supabase import create_client, Client
 from pydantic import BaseModel
+import io
+from PIL import Image
 
 router = APIRouter()
 
@@ -54,9 +56,39 @@ def _format_portfolio(data: dict) -> dict:
         data["templateId"] = data["template_id"]
     if "is_published" in data:
         data["isPublished"] = data["is_published"]
-    if "view_count" in data:
-        data["viewCount"] = data["view_count"]
     return data
+
+
+@router.post("", response_model=dict)
+def create_portfolio(data: ExtractedPortfolio, client: Client = Depends(get_user_supabase), user_id: str = Depends(get_current_user)):
+    import uuid
+    portfolio_id = str(uuid.uuid4())
+    
+    # Ensure slug is unique, especially for sample personas
+    base_slug = data.slug or "portfolio"
+    slug = f"{base_slug}-{portfolio_id[:6]}"
+    
+    portfolio_row = {
+        "id": portfolio_id,
+        "user_id": user_id,
+        "slug": slug,
+        "template_id": data.template_id or "fresh-minimal",
+        "headline": data.headline,
+        "summary": data.summary,
+    }
+    
+    try:
+        # Insert main record
+        res = supabase_admin.table("portfolios").insert(portfolio_row).execute()
+        if not res.data:
+            raise HTTPException(status_code=500, detail="Failed to create portfolio")
+            
+        # Sync the children since it's fully populated
+        sync_portfolio_full(portfolio_id, data, client, user_id)
+        return get_portfolio(portfolio_id, client, user_id)
+    except Exception as e:
+        print("create_portfolio error:", e)
+        raise HTTPException(status_code=500, detail=str(e))
 
 
 @router.get("", response_model=List[dict])
@@ -92,7 +124,6 @@ def update_portfolio(portfolio_id: str, data: dict, client: Client = Depends(get
     key_mapping = {
         "templateId": "template_id",
         "isPublished": "is_published",
-        "viewCount": "view_count",
         "slug": "slug"
     }
     clean = {}
@@ -160,7 +191,7 @@ def publish_portfolio(portfolio_id: str, client: Client = Depends(get_user_supab
 
     if not res.data:
         raise HTTPException(status_code=404, detail="Portfolio not found")
-    return {"slug": res.data[0]["slug"]}
+    return {"slug": res.data[0].get("slug", "")}
 
 
 @router.post("/{portfolio_id}/unpublish")
@@ -251,3 +282,46 @@ def reorder_section(portfolio_id: str, req: ReorderRequest, client: Client = Dep
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
     return {"status": "ok"}
+@router.post("/{portfolio_id}/profile-picture")
+async def upload_profile_picture(portfolio_id: str, file: UploadFile = File(...), client: Client = Depends(get_user_supabase)):
+    # Verify ownership
+    res = client.table("portfolios").select("id").eq("id", portfolio_id).execute()
+    if not res.data:
+        raise HTTPException(status_code=404, detail="Portfolio not found")
+    
+    try:
+        contents = await file.read()
+        image = Image.open(io.BytesIO(contents))
+        
+        # Convert to RGB if needed (e.g. RGBA png)
+        if image.mode in ("RGBA", "P"):
+            image = image.convert("RGB")
+            
+        # Resize to max 400x400 to save space
+        image.thumbnail((400, 400))
+        
+        # Compress to WebP
+        output = io.BytesIO()
+        image.save(output, format="WEBP", quality=70)
+        output.seek(0)
+        
+        # Upload to Supabase Storage (avatars bucket)
+        file_path = f"{portfolio_id}.webp"
+        
+        # Try to remove existing file first if it exists (update is finicky in supabase-py)
+        try:
+            supabase_admin.storage.from_("avatars").remove([file_path])
+        except Exception:
+            pass
+            
+        supabase_admin.storage.from_("avatars").upload(
+            file_path, 
+            output.read(), 
+            {"content-type": "image/webp"}
+        )
+        
+        public_url = f"{settings.SUPABASE_URL}/storage/v1/object/public/avatars/{file_path}"
+        return {"url": public_url}
+    except Exception as e:
+        print("Upload error:", e)
+        raise HTTPException(status_code=500, detail=f"Failed to upload image: {str(e)}")

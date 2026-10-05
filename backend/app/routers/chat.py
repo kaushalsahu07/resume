@@ -46,6 +46,13 @@ def chat_with_portfolio(
         preferred_provider=req.provider,
     )
 
+    if result.get("provider") == "none":
+        # Revert count since the AI request failed completely
+        _user_request_counts[user_id] = count
+        remaining = MAX_REQUESTS - count
+    else:
+        remaining = MAX_REQUESTS - (count + 1)
+
     return ChatResponse(
         reply=result["reply"],
         updatedPortfolio=result["updatedPortfolio"],

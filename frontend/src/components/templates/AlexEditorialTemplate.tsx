@@ -1,3 +1,4 @@
+import ProfileAvatar from '../common/ProfileAvatar'
 import type { Portfolio } from '../../types/portfolio'
 import { SocialIcon } from '../common/SocialIcon'
 
@@ -40,9 +41,17 @@ export default function AlexEditorialTemplate({ portfolio }: { portfolio: Portfo
         <header className="relative z-10 sticky top-0 backdrop-blur-md bg-[#0a0e0a]/80 border-b border-[#00ff41]/20">
           <nav className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-4 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded border border-[#00ff41] flex items-center justify-center text-[#00ff41] text-sm font-bold">
-                AC
-              </div>
+              <ProfileAvatar
+                portfolioId={portfolio.id}
+                alt={name}
+                className="w-8 h-8 rounded border border-[#00ff41] p-[2px] shadow-[0_0_12px_rgba(0,255,65,0.35)]"
+                imgClassName="rounded-[2px]"
+                fallback={
+                  <div className="w-8 h-8 rounded border border-[#00ff41] flex items-center justify-center text-[#00ff41] text-sm font-bold">
+                    AC
+                  </div>
+                }
+              />
               <span className="text-[#00ff41] font-mono text-sm">
                 {name.toLowerCase().split(' ')[0]}.dev
               </span>
@@ -122,6 +131,30 @@ export default function AlexEditorialTemplate({ portfolio }: { portfolio: Portfo
                       <div className="w-3 h-3 rounded-full bg-[#00ff41]/30" />
                     </div>
                     <span className="text-[#00ff41]/60 text-xs ml-auto">portfolio</span>
+                  </div>
+
+                  {/* Identity */}
+                  <div className="flex items-center gap-4 sm:gap-5 mb-5 pb-5 border-b border-[#00ff41]/10">
+                    <ProfileAvatar
+                      portfolioId={portfolio.id}
+                      alt={name}
+                      className="group relative shrink-0 w-20 h-20 sm:w-28 sm:h-28 border border-[#00ff41]/70 p-1 bg-[#020802] shadow-[0_0_30px_rgba(0,255,65,0.22)]"
+                      imgClassName="grayscale contrast-125 brightness-95 transition-all duration-500 group-hover:grayscale-0 group-hover:brightness-100"
+                    >
+                      <span className="pointer-events-none absolute inset-1 bg-[#00ff41]/25 mix-blend-color transition-opacity duration-500 group-hover:opacity-0" />
+                      <span className="pointer-events-none absolute inset-1 bg-[repeating-linear-gradient(0deg,rgba(0,0,0,0.28)_0px,rgba(0,0,0,0.28)_1px,transparent_1px,transparent_3px)]" />
+                      <span className="pointer-events-none absolute -top-1.5 -left-1.5 w-3 h-3 border-t-2 border-l-2 border-[#00ff41]" />
+                      <span className="pointer-events-none absolute -top-1.5 -right-1.5 w-3 h-3 border-t-2 border-r-2 border-[#00ff41]" />
+                      <span className="pointer-events-none absolute -bottom-1.5 -left-1.5 w-3 h-3 border-b-2 border-l-2 border-[#00ff41]" />
+                      <span className="pointer-events-none absolute -bottom-1.5 -right-1.5 w-3 h-3 border-b-2 border-r-2 border-[#00ff41]" />
+                    </ProfileAvatar>
+                    <div className="min-w-0 space-y-1">
+                      <div className="text-gray-500 text-xs">$ whoami</div>
+                      <div className="text-white text-base sm:text-lg font-bold truncate">{name}</div>
+                      {currentRole && (
+                        <div className="text-[#00ff41]/70 text-[11px] sm:text-xs uppercase tracking-widest truncate">{currentRole.role}</div>
+                      )}
+                    </div>
                   </div>
 
                   {/* Code */}

@@ -13,6 +13,9 @@ import PublicPortfolio, { getSubdomainFromHostname } from './pages/PublicPortfol
 import Demo from './pages/Demo'
 import LivePreview from './pages/LivePreview'
 import Account from './pages/Account'
+import NotFound from './pages/NotFound'
+import Privacy from './pages/Privacy'
+import Terms from './pages/Terms'
 
 export default function App() {
   const subdomain = getSubdomainFromHostname()
@@ -29,6 +32,8 @@ export default function App() {
           <Route path="/p/:slug" element={<PublicPortfolio />} />
           <Route path="/demo" element={<Demo />} />
           <Route path="/live-preview" element={<LivePreview />} />
+          <Route path="/privacy" element={<Privacy />} />
+          <Route path="/terms" element={<Terms />} />
           
           {/* Protected Routes */}
           <Route element={<AuthedLayout />}>
@@ -38,8 +43,8 @@ export default function App() {
             <Route path="/account" element={<Account />} />
           </Route>
 
-          {/* Subdomain Catch-All */}
-          {subdomain && <Route path="*" element={<PublicPortfolio subdomainSlug={subdomain} />} />}
+          {/* Catch-All */}
+          <Route path="*" element={subdomain ? <PublicPortfolio subdomainSlug={subdomain} /> : <NotFound />} />
         </Routes>
       </BrowserRouter>
     </AuthProvider>

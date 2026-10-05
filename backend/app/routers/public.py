@@ -1,12 +1,14 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from app.core.supabase_client import supabase_admin
+from app.core.auth import get_optional_user
+from typing import Optional
 
 router = APIRouter()
 
 
 @router.get("/{slug}")
-def get_public_portfolio(slug: str):
-    """Return a published portfolio by its slug. Also increments view count atomically."""
+def get_public_portfolio(slug: str, preview: bool = False, user_id: Optional[str] = Depends(get_optional_user)):
+    """Return a published portfolio by its slug."""
     try:
         res = supabase_admin.table("portfolios").select(
             "*, education(*), experience(*), projects(*), skills(*), achievements(*), links(*)"
@@ -24,16 +26,5 @@ def get_public_portfolio(slug: str):
         portfolio["templateId"] = portfolio["template_id"]
     if "is_published" in portfolio:
         portfolio["isPublished"] = portfolio["is_published"]
-    if "view_count" in portfolio:
-        portfolio["viewCount"] = portfolio["view_count"]
-
-    # Increment view count (best-effort — don't fail the request if this errors)
-    try:
-        new_count = portfolio.get("view_count", 0) + 1
-        supabase_admin.table("portfolios").update({"view_count": new_count}).eq("id", portfolio["id"]).execute()
-        portfolio["view_count"] = new_count
-        portfolio["viewCount"] = new_count
-    except Exception as e:
-        print("view_count increment failed:", e)
 
     return portfolio

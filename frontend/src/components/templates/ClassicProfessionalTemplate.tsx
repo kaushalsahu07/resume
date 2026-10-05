@@ -1,3 +1,4 @@
+import ProfileAvatar from '../common/ProfileAvatar'
 import type { Portfolio } from '../../types/portfolio'
 import { SocialIcon } from '../common/SocialIcon'
 
@@ -6,13 +7,20 @@ export default function ClassicProfessionalTemplate({ portfolio }: { portfolio: 
     <div className="min-h-screen w-full bg-slate-50 text-slate-900 font-sans selection:bg-slate-200">
       <div className="max-w-4xl mx-auto px-4 sm:px-8 py-8 sm:py-16">
         <header className="border-b-2 border-slate-900 pb-6 sm:pb-8 mb-8 text-left flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 sm:gap-6">
-        <div>
-          <h1 className="text-3xl sm:text-4xl font-bold mb-2 uppercase tracking-tight">{portfolio.headline || 'Your Name'}</h1>
-          {portfolio.summary && (
-            <p className="text-muted-foreground max-w-2xl text-xs sm:text-sm leading-relaxed">
-              {portfolio.summary}
-            </p>
-          )}
+        <div className="flex flex-col sm:flex-row items-start sm:items-end gap-5 sm:gap-7">
+          <ProfileAvatar
+            portfolioId={portfolio.id}
+            className="shrink-0 w-24 h-28 sm:w-32 sm:h-36 overflow-hidden bg-slate-200 border-2 border-slate-900 shadow-[6px_6px_0_0_rgba(15,23,42,1)]"
+            imgClassName="grayscale-[15%] contrast-[1.05]"
+          />
+          <div>
+            <h1 className="text-3xl sm:text-4xl font-bold mb-2 uppercase tracking-tight">{portfolio.headline || 'Your Name'}</h1>
+            {portfolio.summary && (
+              <p className="text-muted-foreground max-w-2xl text-xs sm:text-sm leading-relaxed">
+                {portfolio.summary}
+              </p>
+            )}
+          </div>
         </div>
         {portfolio.links?.length > 0 && (
           <div className="flex flex-wrap gap-3 text-xs sm:text-sm font-medium">

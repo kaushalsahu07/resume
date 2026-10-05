@@ -1,3 +1,4 @@
+import ProfileAvatar from '../common/ProfileAvatar'
 import { ArrowRight, Mail, Sparkles, Star } from 'lucide-react'
 import type { Portfolio } from '../../types/portfolio'
 import { SocialIcon } from '../common/SocialIcon'
@@ -117,6 +118,23 @@ export default function DevfolioTemplate({ portfolio }: { portfolio: Portfolio }
 
                 <div className="absolute right-0 top-14 h-28 w-36 rotate-12 rounded-[28px] border border-white/50 bg-gradient-to-br from-[#f8f5ff] to-[#efeafc] shadow-[0_18px_30px_rgba(146,136,202,0.18)]" />
                 <div className="absolute right-10 top-20 h-20 w-24 rotate-12 rounded-[24px] bg-white/70 shadow-sm" />
+
+                <ProfileAvatar
+                  portfolioId={portfolio.id}
+                  alt={name}
+                  className="absolute left-1/2 top-1/2 z-10 h-56 w-48 -translate-x-1/2 -translate-y-1/2 -rotate-3 rounded-[32px] border-[6px] border-white/90 bg-[#efeafc] shadow-[0_30px_60px_rgba(118,99,245,0.30)] transition-transform duration-500 hover:rotate-0 hover:scale-[1.03] sm:h-72 sm:w-60"
+                  imgClassName="rounded-[26px]"
+                >
+                  <span className="absolute -left-8 bottom-6 inline-flex items-center gap-2 rounded-2xl border border-white/70 bg-white/85 px-3 py-2 text-xs font-semibold text-slate-800 shadow-[0_12px_24px_rgba(118,99,245,0.20)] backdrop-blur-md sm:-left-12">
+                    <span className="flex h-6 w-6 items-center justify-center rounded-lg bg-gradient-to-br from-[#7e6af8] to-[#b9a8ff] text-white">
+                      <Sparkles className="h-3.5 w-3.5" />
+                    </span>
+                    <span className="max-w-[120px] truncate">{name}</span>
+                  </span>
+                  <span className="absolute -right-6 top-6 rotate-6 rounded-xl bg-gradient-to-r from-[#7363f5] to-[#8b73f5] px-3 py-1.5 text-[11px] font-bold text-white shadow-[0_12px_24px_rgba(118,99,245,0.30)] sm:-right-10">
+                    {currentRole?.role ? currentRole.role.split(' ').slice(0, 2).join(' ') : 'Developer'}
+                  </span>
+                </ProfileAvatar>
               </div>
             </div>
           </section>
